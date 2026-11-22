@@ -83,7 +83,17 @@
     taken: ["Already chosen", "Já escolhido", "Ya elegido", "已選擇"],
     full: ["All slots used", "Todos os espaços usados", "Todos los espacios usados", "已滿"],
     mvpPet: ["MVP pet", "Pet de MVP", "Mascota MVP", "MVP 寵物"],
-    skill: ["Skill", "Skill", "Habilidad", "技能"]
+    skill: ["Skill", "Skill", "Habilidad", "技能"],
+    ap: ["Album and Plagiarism", "Álbum e Plagiarism", "Álbum y Plagiarism", "卡冊與剽竊"],
+    album: ["Album", "Álbum", "Álbum", "卡冊"],
+    albumLv: ["Card Album upgrade", "Upgrade Card Album", "Mejora Card Album", "Card Album 強化"],
+    albumNote: ["Album cards work in every run, whatever the slot. 1 slot, +1 per Card Album level (Sage).", "As cartas do álbum valem em toda run, de qualquer tipo. 1 slot, +1 por nível do Card Album (Sage).", "Las cartas del álbum valen en cada partida, de cualquier tipo. 1 ranura, +1 por nivel de Card Album (Sage).", "卡冊卡片每場遊戲都有效，不限部位。1 格，Card Album（賢者）每級 +1。"],
+    pickCard: ["Choose a card", "Escolha uma carta", "Elige una carta", "選擇卡片"],
+    plag: ["Plagiarism", "Plagiarism", "Plagiarism", "剽竊"],
+    plagAny: ["1 copied skill shared with every class. Copy it by defeating the MVP with a Thief, Rogue or Assassin.", "1 skill copiada, compartilhada com todas as classes. Copie derrotando o MVP com um Thief, Rogue ou Assassin.", "1 habilidad copiada, compartida con todas las clases. Cópiala derrotando al MVP con un Thief, Rogue o Assassin.", "1 個複製技能，所有職業共用。用 Thief、Rogue 或 Assassin 打倒 MVP 複製。"],
+    plagRogue: ["Rogue / Stalker: up to 3 copied skills.", "Rogue / Stalker: até 3 skills copiadas.", "Rogue / Stalker: hasta 3 habilidades copiadas.", "Rogue / Stalker：最多 3 個複製技能。"],
+    pickPlag: ["Choose a copied skill", "Escolha uma skill copiada", "Elige una habilidad copiada", "選擇複製技能"],
+    from: ["from", "de", "de", "來自"]
   };
   var LI = { en: 0, pt: 1, es: 2, zh: 3 };
   function lang() { var l = document.documentElement.getAttribute("data-ui"); return LI[l] !== undefined ? l : "en"; }
@@ -215,11 +225,15 @@
       var it = D.items[g.id], r = itemTotals(slot, g);
       take({ m: r.m, fx: r.fx }, "i" + g.id, it.ic, it.n, L(it.d));
     });
+    (S.album || []).slice(0, albumCap()).forEach(function (cid) { var c = D.cards[cid]; if (c) take(c, "c" + cid, c.ic, c.n, L(c.d)); });
     (S.pacts || []).forEach(function (k) { var p = D.pacts[k]; if (p) take(p, "p" + k, p.ic, pactName(k), L(p.d), !p.m && !p.fx); });
     (S.dishes || []).slice(0, S.chef || 1).forEach(function (k) { var d = D.dishes[k]; if (d) take(d, "d" + k, d.ic, d.n, L(d.d), true); });
     if (S.pet && D.pets[S.pet]) { var pt = D.pets[S.pet]; take(pt, "pet" + S.pet, pt.ic, pt.n, L(pt.d), !!pt.mvp); }
     return { all: all, specials: specials };
   }
+  function albumCap() { return D.rules.albumBase + (S.albumLv || 0); }
+  function plagCap() { return cls().rogue ? D.rules.plagRogue : D.rules.plagAny; }
+  function plagOptions() { var own = cls().own || []; return Object.keys(D.plag).filter(function (k) { return own.indexOf(k) < 0; }); }
   function pactName(k) { var n = D.pacts[k].n; if (!n) return k; var en = n.en.replace(/^Pact of (the )?/i, "").replace(/ Pact$/, ""); en = en.charAt(0).toUpperCase() + en.slice(1); return lang() === "en" ? en : en + " (" + L(n) + ")"; }
   function fmt(k, v) {
     var lab = D.labels[k], pct = lab ? lab.pct : Math.abs(v) < 5;
@@ -229,7 +243,7 @@
   function labelOf(k) { return D.labels[k] ? L(D.labels[k].n) : k.replace(/_/g, " "); }
 
   /* ---------------- state ---------------- */
-  function fresh(c) { return { v: 1, cls: c, name: "", reborn: true, tower: D.rules.towerFloors.slice(), gear: {}, pacts: [], dishes: [], chef: D.rules.chefMax, pet: "" }; }
+  function fresh(c) { return { v: 1, cls: c, name: "", reborn: true, tower: D.rules.towerFloors.slice(), gear: {}, pacts: [], dishes: [], chef: D.rules.chefMax, pet: "", album: [], albumLv: D.rules.albumUpgrades, plag: [] }; }
   function persist() { try { localStorage.setItem(LS_CUR, JSON.stringify(S)); } catch (e) {} }
   function savedList() { try { return JSON.parse(localStorage.getItem(LS_SAVED) || "[]"); } catch (e) { return []; } }
   function setSaved(a) { try { localStorage.setItem(LS_SAVED, JSON.stringify(a)); } catch (e) {} }
@@ -242,7 +256,9 @@
     var uniq = function (a, src, n) { var out = []; (a || []).forEach(function (x) { if (src[x] && out.indexOf(x) < 0 && out.length < n) out.push(x); }); return out; };
     var chef = Math.max(1, Math.min(D.rules.chefMax, +o.chef || D.rules.chefMax));
     return { v: 1, cls: o.cls, name: String(o.name || "").slice(0, 60), reborn: !!o.reborn, tower: (o.tower || []).filter(function (f) { return D.rules.towerFloors.indexOf(f) >= 0; }), gear: g,
-      pacts: uniq(o.pacts, D.pacts, D.rules.maxPacts), dishes: uniq(o.dishes, D.dishes, D.rules.chefMax), chef: chef, pet: D.pets[o.pet] ? o.pet : "" };
+      pacts: uniq(o.pacts, D.pacts, D.rules.maxPacts), dishes: uniq(o.dishes, D.dishes, D.rules.chefMax), chef: chef, pet: D.pets[o.pet] ? o.pet : "",
+      albumLv: Math.max(0, Math.min(D.rules.albumUpgrades, o.albumLv === undefined ? D.rules.albumUpgrades : +o.albumLv)),
+      album: uniq(o.album, D.cards, D.rules.albumBase + D.rules.albumUpgrades), plag: uniq(o.plag, D.plag, D.rules.plagRogue) };
   }
 
   /* ---------------- rendering ---------------- */
@@ -296,7 +312,7 @@
       '<p class="pl-note muted">' + t("countNote") + "</p></section>" + savedHtml() + "</div>";
     var doll = SLOT_ORDER.filter(function (s) { return s !== "shield" || c.shield || c.dual; }).map(slotCard).join("");
     var center = '<div class="pl-col pl-center"><section class="pl-box"><h2>' + t("equipment") + '</h2><div class="pl-doll">' + doll + "</div>" +
-      (c.dual ? '<p class="pl-note muted">' + t("leftHalf") + "</p>" : "") + "</section>" + ppdHtml() + "</div>";
+      (c.dual ? '<p class="pl-note muted">' + t("leftHalf") + "</p>" : "") + "</section>" + apHtml() + ppdHtml() + "</div>";
     var rows = Object.keys(D.labels).filter(function (k) { return tot.all[k] && Math.abs(tot.all[k]) > 1e-9; })
       .map(function (k) { return "<tr><td>" + esc(labelOf(k)) + '</td><td class="n">' + fmt(k, tot.all[k]) + "</td></tr>"; }).join("");
     var extra = "";
@@ -316,6 +332,19 @@
     return '<button class="pl-chip" type="button" data-' + kind + '="' + key + '">' + ico(ic, "pl-chip-ic") + '<span><b>' + esc(n) + "</b>" + (sub ? "<small>" + esc(sub) + "</small>" : "") + '</span><i aria-hidden="true">×</i></button>';
   }
   function addBtn(kind) { return '<button class="pl-chip pl-add" type="button" data-add="' + kind + '">+ ' + t("add") + "</button>"; }
+  function apHtml() {
+    var cap = albumCap(), pc = plagCap();
+    var cards = (S.album || []).slice(0, cap).map(function (cid) { var c = D.cards[cid]; return chip("album", cid, c.ic, c.n, c.mvp ? "MVP" : ""); }).join("");
+    if ((S.album || []).length < cap) cards += addBtn("album");
+    var plags = (S.plag || []).filter(function (k) { return plagOptions().indexOf(k) >= 0; }).slice(0, pc)
+      .map(function (k) { var x = D.plag[k]; return chip("plag", k, x.ic, x.n, t("from") + " " + x.boss); }).join("");
+    if ((S.plag || []).length < pc) plags += addBtn("plag");
+    var lv = ""; for (var i = 0; i <= D.rules.albumUpgrades; i++) lv += '<option value="' + i + '"' + (i === (S.albumLv || 0) ? " selected" : "") + ">" + i + " (" + (D.rules.albumBase + i) + ")</option>";
+    return '<section class="pl-box"><h2>' + t("ap") + "</h2>" +
+      "<h3>" + t("album") + ' <b class="pl-cap">' + Math.min((S.album || []).length, cap) + "/" + cap + "</b></h3>" +
+      '<label class="pl-chef">' + t("albumLv") + ' <select data-act="albumlv">' + lv + '</select></label><div class="pl-chips">' + cards + '</div><p class="pl-note muted">' + t("albumNote") + "</p>" +
+      "<h3>" + t("plag") + ' <b class="pl-cap">' + Math.min((S.plag || []).length, pc) + "/" + pc + '</b></h3><div class="pl-chips">' + plags + '</div><p class="pl-note muted">' + (cls().rogue ? t("plagRogue") : t("plagAny")) + "</p></section>";
+  }
   function ppdHtml() {
     var mp = D.rules.maxPacts, chef = S.chef || 1;
     var pacts = (S.pacts || []).map(function (k) { var tab = D.pactTabs.filter(function (x) { return x.id === D.pacts[k].tab; })[0]; return chip("pact", k, D.pacts[k].ic, pactName(k), tab ? L(tab.n) : ""); }).join("");
@@ -367,6 +396,9 @@
     root.querySelectorAll("[data-dish]").forEach(function (b) { b.onclick = function () { S.dishes = S.dishes.filter(function (x) { return x !== b.getAttribute("data-dish"); }); persist(); render(); }; });
     root.querySelectorAll("[data-pet]").forEach(function (b) { b.onclick = function () { S.pet = ""; persist(); render(); }; });
     root.querySelectorAll("[data-add]").forEach(function (b) { b.onclick = function () { openEditor("@" + b.getAttribute("data-add")); }; });
+    root.querySelectorAll("[data-album]").forEach(function (b) { b.onclick = function () { S.album = S.album.filter(function (x) { return x !== b.getAttribute("data-album"); }); persist(); render(); }; });
+    root.querySelectorAll("[data-plag]").forEach(function (b) { b.onclick = function () { S.plag = S.plag.filter(function (x) { return x !== b.getAttribute("data-plag"); }); persist(); render(); }; });
+    var al = q('[data-act="albumlv"]'); if (al) al.onchange = function () { S.albumLv = +al.value; S.album = S.album.slice(0, albumCap()); persist(); render(); };
     var ch = q('[data-act="chef"]'); if (ch) ch.onchange = function () { S.chef = +ch.value; S.dishes = S.dishes.slice(0, S.chef); persist(); render(); };
     root.querySelectorAll("[data-load]").forEach(function (b) { b.onclick = function () { var x = savedList()[+b.getAttribute("data-load")]; if (x && valid(x.data)) { S = clean(x.data); persist(); render(); window.scrollTo(0, 0); } }; });
     root.querySelectorAll("[data-del]").forEach(function (b) { b.onclick = function () { var a = savedList(); a.splice(+b.getAttribute("data-del"), 1); setSaved(a); render(); }; });
@@ -398,14 +430,16 @@
   }
 
   function drawPick(kind) {
-    var src = kind === "pact" ? D.pacts : kind === "dish" ? D.dishes : D.pets;
-    var chosen = kind === "pact" ? S.pacts : kind === "dish" ? S.dishes : (S.pet ? [S.pet] : []);
-    var title = t(kind === "pact" ? "pickPact" : kind === "dish" ? "pickDish" : "pickPet");
+    var src = kind === "pact" ? D.pacts : kind === "dish" ? D.dishes : kind === "album" ? D.cards : kind === "plag" ? D.plag : D.pets;
+    var chosen = kind === "pact" ? S.pacts : kind === "dish" ? S.dishes : kind === "album" ? S.album : kind === "plag" ? S.plag : (S.pet ? [S.pet] : []);
+    var title = t(kind === "pact" ? "pickPact" : kind === "dish" ? "pickDish" : kind === "album" ? "pickCard" : kind === "plag" ? "pickPlag" : "pickPet");
     var q = filt.q.toLowerCase();
-    var keys = Object.keys(src).filter(function (k) { var n = kind === "pact" ? pactName(k) : src[k].n; return !q || n.toLowerCase().indexOf(q) >= 0 || L(src[k].d).toLowerCase().indexOf(q) >= 0; });
+    var pool = kind === "plag" ? plagOptions() : Object.keys(src);
+    var keys = pool.filter(function (k) { var n = kind === "pact" ? pactName(k) : src[k].n; return !q || n.toLowerCase().indexOf(q) >= 0 || L(src[k].d).toLowerCase().indexOf(q) >= 0; });
     var row = function (k) {
       var x = src[k], taken = chosen.indexOf(k) >= 0, n = kind === "pact" ? pactName(k) : x.n;
-      var sub = kind === "pet" && x.mvp ? t("mvpPet") + (x.sk ? " · " + t("skill") + ": " + L(x.sk) : "") : "";
+      var sub = kind === "pet" && x.mvp ? t("mvpPet") + (x.sk ? " · " + t("skill") + ": " + L(x.sk) : "") :
+        kind === "album" ? L(D.slotNames[x.t]) + (x.mvp ? " · MVP" : "") : kind === "plag" ? t("from") + " " + x.boss : "";
       return '<button type="button" class="pl-opt' + (taken ? " blocked" : "") + (x.mvp ? " r-l" : "") + '" data-k="' + k + '"' + (taken ? ' aria-disabled="true"' : "") + ">" + ico(x.ic) +
         "<span><b>" + esc(n) + "</b>" + (sub || taken ? "<small>" + esc(sub) + (taken ? (sub ? " · " : "") + t("taken") : "") + "</small>" : "") + (x.d ? "<em>" + esc(L(x.d)) + "</em>" : "") + "</span></button>";
     };
@@ -417,6 +451,11 @@
       });
       var rest = keys.filter(function (k) { return !D.pactTabs.some(function (tb) { return tb.id === src[k].tab; }); });
       if (rest.length) list += '<h3 class="pl-group">—</h3>' + rest.map(row).join("");
+    } else if (kind === "album") {
+      ["weapon", "head", "armor", "garment", "shoes", "acc", "shield"].forEach(function (ty) {
+        var ks = keys.filter(function (k) { return src[k].t === ty; }).sort(function (a, b) { return ((src[b].mvp || 0) - (src[a].mvp || 0)) || src[a].n.localeCompare(src[b].n); });
+        if (ks.length) list += '<h3 class="pl-group">' + esc(L(D.slotNames[ty])) + "</h3>" + ks.map(row).join("");
+      });
     } else {
       keys.sort(function (a, b) { return ((src[b].mvp || 0) - (src[a].mvp || 0)) || src[a].n.localeCompare(src[b].n); });
       list = keys.map(row).join("");
@@ -433,6 +472,8 @@
         if (kind === "pact" && S.pacts.length < D.rules.maxPacts) S.pacts.push(k);
         else if (kind === "dish" && S.dishes.length < (S.chef || 1)) S.dishes.push(k);
         else if (kind === "pet") S.pet = k;
+        else if (kind === "album" && S.album.length < albumCap()) S.album.push(k);
+        else if (kind === "plag" && S.plag.length < plagCap()) S.plag.push(k);
         persist(); closeEditor();
       };
     });
