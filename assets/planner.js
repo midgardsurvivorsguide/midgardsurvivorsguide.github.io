@@ -42,7 +42,7 @@
     del: ["Delete", "Apagar", "Borrar", "刪除"],
     search: ["Search…", "Buscar…", "Buscar…", "搜尋…"],
     all: ["All", "Todos", "Todos", "全部"],
-    rN: ["Normal", "Normal", "Normal", "普通"], rP: ["Purple", "Roxo", "Morado", "紫色"], rL: ["Legendary", "Lendário", "Legendario", "傳說"],
+    rN: ["Epic", "Épico", "Épico", "史詩"], rP: ["Purple", "Roxo", "Morado", "紫色"], rL: ["Legendary", "Lendário", "Legendario", "傳說"],
     rU: ["Unique", "Único", "Único", "唯一"], rS: ["Soul", "Alma", "Alma", "靈魂"],
     remove: ["Remove item", "Remover item", "Quitar objeto", "移除裝備"],
     done: ["Done", "Pronto", "Listo", "完成"],
