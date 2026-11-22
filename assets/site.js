@@ -29,6 +29,7 @@
     document.querySelectorAll("[data-l]").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.l === l ? "true" : "false"); });
     store("lang", l); paintTheme(); spy();
     if (typeof closeAll === "function") closeAll();
+    try { document.dispatchEvent(new CustomEvent("langchange", { detail: l })); } catch (e) {}
   };
   (function () {
     var q = (location.search.match(/[?&]lang=(en|pt|es|zh)/) || location.hash.match(/^#(en|pt|es|zh)$/) || [])[1];
