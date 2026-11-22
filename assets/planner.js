@@ -50,6 +50,10 @@
     copyImg: ["Copy image", "Copiar imagem", "Copiar imagen", "複製圖片"],
     imgCopied: ["Image copied: paste it on Discord", "Imagem copiada: cole no Discord", "Imagen copiada: pégala en Discord", "已複製圖片，可貼到 Discord"],
     making: ["Drawing…", "Desenhando…", "Dibujando…", "繪製中…"],
+    dup: ["Duplicate build", "Duplicar build", "Duplicar build", "複製配裝"],
+    dupDone: ["Copy created and saved", "Cópia criada e salva", "Copia creada y guardada", "已建立並儲存副本"],
+    copyOf: ["copy", "cópia", "copia", "副本"],
+    dupShort: ["Copy", "Copiar", "Copiar", "複製"],
     harmony: ["Refine harmony", "Harmonia de grade", "Armonía de grado", "等級和諧"],
     harmonyTxt: ["5+ graded armour pieces: every grade bonus counts", "5+ peças de armadura com grade: cada bônus de grade conta", "5+ piezas de armadura con grado: cada bono de grado cuenta", "5 件以上有等級的防具：等級加成額外計算"],
     soulOff: ["Soul slot opens on a reborn class (or a class that does not rebirth): this soul is not active yet.", "O slot de alma abre na classe renascida (ou que não renasce): esta alma ainda não está ativa.", "La ranura de alma se abre con la clase renacida (o que no renace): esta alma aún no está activa.", "靈魂欄位在職業轉生後開啟（或不轉生的職業）：此靈魂尚未生效。"],
@@ -428,6 +432,7 @@
       '<p class="pl-note muted">' + t("totalsNote") + "</p>" +
       '<button class="btn pl-wide pl-primary" type="button" data-act="save">' + t("save") + '</button>' +
       '<button class="btn pl-wide" type="button" data-act="share">' + t("share") + '</button>' +
+      '<button class="btn pl-wide" type="button" data-act="dup">' + t("dup") + '</button>' +
       '<button class="btn pl-wide" type="button" data-act="image">' + t("img") + '</button>' +
       '<button class="btn pl-wide" type="button" data-act="reset">' + t("reset") + "</button></section></div>";
     root.innerHTML = '<div class="pl-grid">' + left + center + right + "</div>";
@@ -492,7 +497,7 @@
     var list = a.length ? a.map(function (b, i) {
       var c = D.classes.filter(function (x) { return x.id === b.data.cls; })[0];
       return '<li><img src="' + BASE + "../assets/icons/job_" + b.data.cls + '.png" alt=""><span><b>' + esc(b.name || t("untitled")) + "</b><small>" + esc(c ? (D.classNames[c.id] || c.name) : "") + "</small></span>" +
-        '<button class="btn" type="button" data-load="' + i + '">' + t("load") + '</button><button class="btn" type="button" data-del="' + i + '" aria-label="' + t("del") + '">×</button></li>';
+        '<button class="btn" type="button" data-load="' + i + '">' + t("load") + '</button><button class="btn" type="button" data-dup="' + i + '" title="' + t("dup") + '">' + t("dupShort") + '</button><button class="btn" type="button" data-del="' + i + '" aria-label="' + t("del") + '">×</button></li>';
     }).join("") : '<li class="muted">' + t("noSaved") + "</li>";
     return '<section class="pl-box"><h2>' + t("saved") + '</h2><ul class="pl-saved">' + list + "</ul></section>";
   }
@@ -505,6 +510,28 @@
     var rb = q('[data-act="reborn"]'); if (rb) rb.onchange = function (e) { S.reborn = e.target.checked; persist(); render(); };
     var tw = q('[data-act="tower"]'); if (tw) tw.onchange = function () { S.towerTop = +tw.value; persist(); render(); };
     q('[data-act="allopen"]').onclick = function () { S.reborn = true; S.towerTop = Math.max(S.towerTop || 0, 100); persist(); render(); };
+    function uniqueName(base) {
+      var names = savedList().map(function (b) { return b.name; }), root2 = String(base || t("untitled")).replace(/ \((?:copy|cópia|copia|副本)(?: \d+)?\)$/, "");
+      var n = root2 + " (" + t("copyOf") + ")", k = 2;
+      while (names.indexOf(n) >= 0) n = root2 + " (" + t("copyOf") + " " + (k++) + ")";
+      return n;
+    }
+    function saveEntry(state) {
+      var a = savedList(), i = a.map(function (b) { return b.name; }).indexOf(state.name);
+      var e = { name: state.name, data: JSON.parse(JSON.stringify(state)), at: Date.now() };
+      if (i >= 0) a[i] = e; else a.unshift(e); setSaved(a.slice(0, 50));
+    }
+    q('[data-act="dup"]').onclick = function () {
+      if (!S.name) S.name = t("untitled");
+      saveEntry(S);
+      var copy = JSON.parse(JSON.stringify(S)); copy.name = uniqueName(S.name);
+      saveEntry(copy); S = clean(copy); persist(); render(); window.scrollTo(0, 0);
+      flash(root.querySelector('[data-act="dup"]'), t("dupDone"));
+    };
+    root.querySelectorAll("[data-dup]").forEach(function (b) { b.onclick = function () {
+      var x = savedList()[+b.getAttribute("data-dup")]; if (!x || !valid(x.data)) return;
+      var copy = clean(x.data); copy.name = uniqueName(x.name); saveEntry(copy); S = copy; persist(); render(); window.scrollTo(0, 0);
+    }; });
     q('[data-act="save"]').onclick = function () {
       var a = savedList(), name = S.name || t("untitled"), i = a.map(function (b) { return b.name; }).indexOf(name);
       var entry = { name: name, data: JSON.parse(JSON.stringify(S)), at: Date.now() };

@@ -720,3 +720,7 @@ html:not(.dark) .sub-btn.lv-beginner b { color: #23733a; } html:not(.dark) .sub-
   box-shadow: 3px 3px 0 rgba(0,0,0,.3); }
 .hero .credit .credit-k { background: #1c1b19; color: #fff7ec; font: 400 11px var(--font-ui); text-transform: uppercase; letter-spacing: .8px; padding: 6px 10px; display: flex; align-items: center; }
 .hero .credit b { background: var(--lv-adv, #e2b33c); color: #2a1c05; font: 400 14px var(--font-pixel); padding: 6px 12px; display: flex; align-items: center; }
+.pl-saved li { flex-wrap: wrap; row-gap: 4px; padding-bottom: 6px; border-bottom: 1px solid var(--lo); }
+.pl-saved li span { flex: 1 1 calc(100% - 32px); }
+.pl-saved li [data-load] { margin-left: 28px; }
+.pl-saved li .btn { flex: none; }
