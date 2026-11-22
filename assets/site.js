@@ -68,13 +68,14 @@
     var showLevel = function (lv, push) {
       lvtabs.forEach(function (t) { t.setAttribute("aria-selected", t.getAttribute("data-lv") === lv ? "true" : "false"); });
       document.querySelectorAll(".lvpanel").forEach(function (p) { p.hidden = p.getAttribute("data-lv") !== lv; });
+      var hb = document.querySelector(".homebar"); if (hb) hb.setAttribute("data-lv", lv);
       try { localStorage.setItem("homeLevel", lv); } catch (e) {}
       if (push && history.replaceState) history.replaceState(null, "", "#" + lv);
     };
     lvtabs.forEach(function (t) { t.addEventListener("click", function () { showLevel(t.getAttribute("data-lv"), true); }); });
     var h = (location.hash || "").replace("#", ""), saved = null;
     try { saved = localStorage.getItem("homeLevel"); } catch (e) {}
-    var ok = function (v) { return v === "beginner" || v === "intermediate" || v === "advanced"; };
+    var ok = function (v) { return v === "beginner" || v === "intermediate" || v === "advanced" || v === "public"; };
     showLevel(ok(h) ? h : ok(saved) ? saved : "beginner", false);
   }
 

@@ -540,3 +540,12 @@ section, .card, .hero, .rail-box, .shot, .video { overflow: hidden; }
 /* brand logo: Angeling sprite (wide), on a light panel so the pink reads */
 .brand .logo { background: var(--panel-3); }
 .brand .logo .ico.i-brand_angeling { width: 34px; height: 24px; background-size: contain; background-repeat: no-repeat; background-position: center; image-rendering: pixelated; }
+
+/* home: Public Builds tab (community builds; empty state for now) */
+.dotlv.lv-public { background: var(--blue); }
+.homebar[data-lv="public"] .clsbar { display: none; }
+.pub-empty { text-align: center; padding: 48px 20px; background: var(--panel); border: var(--px) solid var(--border); border-radius: var(--radius);
+  box-shadow: inset 2px 2px 0 var(--hi), inset -2px -2px 0 var(--lo), var(--shadow); }
+.pub-empty .ico { width: 64px; height: 44px; background-size: contain; background-repeat: no-repeat; background-position: center; image-rendering: pixelated; }
+.pub-empty h2 { font: 400 16px var(--font-pixel); margin: 14px 0 8px; }
+.pub-empty p { margin: 0 auto; max-width: 460px; }
