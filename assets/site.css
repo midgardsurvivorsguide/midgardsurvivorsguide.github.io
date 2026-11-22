@@ -677,3 +677,15 @@ section, .card, .hero, .rail-box, .shot, .video { overflow: hidden; }
 .pl-chip .pl-chip-ic[src*="/c_"] { object-fit: cover; padding: 0; }
 
 .beta { font: 400 10px var(--font-ui); text-transform: lowercase; letter-spacing: .3px; opacity: .85; margin-left: 6px; }
+
+/* difficulty colours (contrast first: light fill + dark text, >= 7:1) */
+:root { --lv-beg: #3fae5c; --lv-beg-ink: #0c1d10; --lv-int: #a98bff; --lv-int-ink: #170b33; --lv-adv: #e2b33c; --lv-adv-ink: #2a1c05; }
+.tag.lv-intermediate { background: var(--lv-int); color: var(--lv-int-ink); }
+.btn.lvbtn.lv-beginner { background: var(--lv-beg); color: var(--lv-beg-ink); }
+.btn.lvbtn.lv-intermediate { background: var(--lv-int); color: var(--lv-int-ink); }
+.btn.lvbtn.lv-advanced { background: var(--lv-adv); color: var(--lv-adv-ink); }
+.btn.lvbtn:hover { filter: brightness(1.08); }
+.mainnav .btn.lvbtn[aria-current] { box-shadow: inset 0 0 0 2px var(--border), 0 0 0 2px currentColor; }
+.sub-btn.lv-beginner b { color: var(--lv-beg); } .sub-btn.lv-intermediate b { color: var(--lv-int); } .sub-btn.lv-advanced b { color: var(--lv-adv); }
+html:not(.dark) .sub-btn.lv-beginner b { color: #23733a; } html:not(.dark) .sub-btn.lv-intermediate b { color: #5b34c2; } html:not(.dark) .sub-btn.lv-advanced b { color: #8a6210; }
+.dotlv.lv-intermediate { background: var(--lv-int); } .dotlv.lv-beginner { background: var(--lv-beg); } .dotlv.lv-advanced { background: var(--lv-adv); }
