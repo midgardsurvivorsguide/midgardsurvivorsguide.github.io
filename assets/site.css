@@ -710,3 +710,13 @@ html:not(.dark) .sub-btn.lv-beginner b { color: #23733a; } html:not(.dark) .sub-
 .pl-lim { width: 92px; }
 .pl-sk .tw { overflow-x: visible; }
 @media (max-width: 760px) { .pl-sk .tw { overflow-x: auto; } .pl-lim { width: 64px; } }
+
+/* planner: export image */
+.pl-imgbox { width: min(1100px, 100%); }
+.pl-imgprev { display: block; width: 100%; height: auto; border: 2px solid var(--border); border-radius: var(--radius); }
+
+/* build author credit, highlighted in the guide hero */
+.hero .credit { display: inline-flex; align-items: stretch; margin: 12px 0 0; border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  box-shadow: 3px 3px 0 rgba(0,0,0,.3); }
+.hero .credit .credit-k { background: #1c1b19; color: #fff7ec; font: 400 11px var(--font-ui); text-transform: uppercase; letter-spacing: .8px; padding: 6px 10px; display: flex; align-items: center; }
+.hero .credit b { background: var(--lv-adv, #e2b33c); color: #2a1c05; font: 400 14px var(--font-pixel); padding: 6px 12px; display: flex; align-items: center; }

@@ -44,6 +44,12 @@
     banned: ["Banished", "Banido", "Desterrado", "已放逐"],
     up: ["Move up", "Subir", "Subir", "上移"], down: ["Move down", "Descer", "Bajar", "下移"],
     stat: ["Attribute", "Atributo", "Atributo", "能力值"], passive: ["Passive", "Passiva", "Pasiva", "被動"], active: ["Skill", "Skill", "Habilidad", "主動"],
+    img: ["Export as image", "Exportar imagem", "Exportar imagen", "匯出圖片"],
+    imgTitle: ["Build image", "Imagem da build", "Imagen de la build", "配裝圖片"],
+    download: ["Download PNG", "Baixar PNG", "Descargar PNG", "下載 PNG"],
+    copyImg: ["Copy image", "Copiar imagem", "Copiar imagen", "複製圖片"],
+    imgCopied: ["Image copied: paste it on Discord", "Imagem copiada: cole no Discord", "Imagen copiada: pégala en Discord", "已複製圖片，可貼到 Discord"],
+    making: ["Drawing…", "Desenhando…", "Dibujando…", "繪製中…"],
     harmony: ["Refine harmony", "Harmonia de grade", "Armonía de grado", "等級和諧"],
     harmonyTxt: ["5+ graded armour pieces: every grade bonus counts", "5+ peças de armadura com grade: cada bônus de grade conta", "5+ piezas de armadura con grado: cada bono de grado cuenta", "5 件以上有等級的防具：等級加成額外計算"],
     soulOff: ["Soul slot opens on a reborn class (or a class that does not rebirth): this soul is not active yet.", "O slot de alma abre na classe renascida (ou que não renasce): esta alma ainda não está ativa.", "La ranura de alma se abre con la clase renacida (o que no renace): esta alma aún no está activa.", "靈魂欄位在職業轉生後開啟（或不轉生的職業）：此靈魂尚未生效。"],
@@ -422,6 +428,7 @@
       '<p class="pl-note muted">' + t("totalsNote") + "</p>" +
       '<button class="btn pl-wide pl-primary" type="button" data-act="save">' + t("save") + '</button>' +
       '<button class="btn pl-wide" type="button" data-act="share">' + t("share") + '</button>' +
+      '<button class="btn pl-wide" type="button" data-act="image">' + t("img") + '</button>' +
       '<button class="btn pl-wide" type="button" data-act="reset">' + t("reset") + "</button></section></div>";
     root.innerHTML = '<div class="pl-grid">' + left + center + right + "</div>";
     wire();
@@ -512,6 +519,7 @@
       else prompt(t("share"), url);
     };
     q('[data-act="reset"]').onclick = function () { S.gear = {}; persist(); render(); };
+    q('[data-act="image"]').onclick = openImage;
     root.querySelectorAll("[data-pact]").forEach(function (b) { b.onclick = function () { S.pacts = S.pacts.filter(function (x) { return x !== b.getAttribute("data-pact"); }); persist(); render(); }; });
     root.querySelectorAll("[data-dish]").forEach(function (b) { b.onclick = function () { S.dishes = S.dishes.filter(function (x) { return x !== b.getAttribute("data-dish"); }); persist(); render(); }; });
     root.querySelectorAll("[data-pet]").forEach(function (b) { b.onclick = function () { S.pet = ""; persist(); render(); }; });
@@ -751,6 +759,146 @@
     });
     modal.querySelector('[data-act="remove"]').onclick = function () { delete S.gear[slot]; persist(); drawEditor(); };
     modal.querySelector("[data-x2]").onclick = closeEditor;
+  }
+
+  /* ---------------- export as image (canvas, same-origin icons, always dark for Discord) ---------------- */
+  var IC = { bg: "#1c1b19", panel: "#2a2926", panel2: "#33312d", border: "#0e0d0c", ink: "#ede7db", muted: "#a59d8b", red: "#c8333a",
+    gold: "#e2b33c", r: { n: "#8b5cf6", p: "#8b5cf6", l: "#e0a526", u: "#22b8c8", s: "#d94f7a" } };
+  var FP = '"Press Start 2P", monospace', FU = '"Silkscreen", monospace', FB = '"Inter", "Noto Sans TC", system-ui, sans-serif';
+  function loadImg(src) { return new Promise(function (res) { if (!src) return res(null); var im = new Image(); im.onload = function () { res(im); }; im.onerror = function () { res(null); }; im.src = src; }); }
+  function iconSrc(file) { return file ? BASE + "icons/" + file + ".png" : null; }
+  function rr(c, x, y, w, h, rad, fill, stroke) {
+    c.beginPath(); c.moveTo(x + rad, y); c.arcTo(x + w, y, x + w, y + h, rad); c.arcTo(x + w, y + h, x, y + h, rad); c.arcTo(x, y + h, x, y, rad); c.arcTo(x, y, x + w, y, rad); c.closePath();
+    if (fill) { c.fillStyle = fill; c.fill(); } if (stroke) { c.lineWidth = 2; c.strokeStyle = stroke; c.stroke(); }
+  }
+  function fit(c, txt, w) { if (c.measureText(txt).width <= w) return txt; while (txt.length > 1 && c.measureText(txt + "…").width > w) txt = txt.slice(0, -1); return txt + "…"; }
+  function drawIcon(c, im, x, y, size, cover) {
+    if (!im) return;
+    var k = cover ? Math.max(size / im.width, size / im.height) : Math.min(size / im.width, size / im.height);
+    var w = im.width * k, h = im.height * k;
+    c.save(); c.beginPath(); c.rect(x, y, size, size); c.clip(); c.imageSmoothingEnabled = !(im.width <= 40);
+    c.drawImage(im, x + (size - w) / 2, y + (size - h) / 2, w, h); c.restore();
+  }
+  function box(c, x, y, w, h, title) {
+    rr(c, x, y, w, h, 8, IC.panel, IC.border);
+    if (title) { c.fillStyle = IC.red; rr(c, x + 2, y + 2, w - 4, 26, 6, IC.red); c.fillStyle = "#fff7ec"; c.font = "11px " + FP; c.textBaseline = "middle"; c.fillText(title, x + 12, y + 16); }
+  }
+  async function makeImage() {
+    try { if (document.fonts) { await Promise.all([document.fonts.load("16px " + FP), document.fonts.load("12px " + FU), document.fonts.load("bold 14px Inter"), document.fonts.load("14px Inter")]); } } catch (e) {}
+    var c0 = cls(), tot = buildTotals(), W = 1200, PAD = 20;
+    var gearSlots = SLOT_ORDER.filter(function (sl) { return sl !== "shield" || c0.shield || c0.dual; });
+    var need = [iconSrc(null)], urls = {};
+    function want(file) { if (file && !urls[file]) urls[file] = loadImg(iconSrc(file)); }
+    gearSlots.forEach(function (sl) { var g = S.gear[sl]; if (!g) return; want(D.items[g.id].ic); (g.cards || []).forEach(function (cid) { if (D.cards[cid]) want(D.cards[cid].ic); }); });
+    (S.pacts || []).forEach(function (k) { want(D.pacts[k].ic); }); (S.dishes || []).forEach(function (k) { want(D.dishes[k].ic); });
+    if (S.pet) want(D.pets[S.pet].ic); (S.album || []).forEach(function (k) { want(D.cards[k].ic); }); (S.plag || []).forEach(function (k) { want(D.plag[k].ic); });
+    (S.prio || []).forEach(function (p) { var x = upInfo(p.id); if (x && x.ic) want(x.ic); });
+    var banner = await loadImg(BASE + "../assets/banners/class-" + c0.id + ".png"), job = await loadImg(BASE + "../assets/icons/job_" + c0.id + ".png"), logo = await loadImg(BASE + "../assets/icons/brand_angeling.png");
+    var IM = {}; for (var f in urls) IM[f] = await urls[f];
+    // layout heights
+    var rowsG = Math.ceil(gearSlots.length / 2), gearH = 40 + rowsG * 64;
+    var keys = Object.keys(D.labels).filter(function (k) { return tot.all[k] && Math.abs(tot.all[k]) > 1e-9; }).slice(0, 18);
+    var totH = 40 + Math.max(keys.length, 1) * 24 + (tot.jb ? 28 : 0);
+    var topH = Math.max(gearH, totH);
+    var prio = (S.prio || []).filter(function (p) { return upPool().indexOf(p.id) >= 0; });
+    var prioRows = Math.ceil(prio.length / 2), prioH = prio.length ? 40 + prioRows * 26 + (S.banish.length ? 44 : 0) : (S.banish.length ? 84 : 0);
+    var H = 150 + PAD + topH + PAD + 150 + PAD + (prioH ? prioH + PAD : 0) + 34;
+    var cv = document.createElement("canvas"); cv.width = W; cv.height = H; var c = cv.getContext("2d");
+    c.fillStyle = IC.bg; c.fillRect(0, 0, W, H);
+    // header
+    if (banner) { c.save(); c.imageSmoothingEnabled = false; var bk = 150 / banner.height, bw = banner.width * bk; c.drawImage(banner, W - bw, 0, bw, 150); c.restore(); }
+    var gr = c.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, "rgba(16,10,12,.96)"); gr.addColorStop(.55, "rgba(16,10,12,.75)"); gr.addColorStop(1, "rgba(16,10,12,0)");
+    c.fillStyle = gr; c.fillRect(0, 0, W, 150);
+    c.fillStyle = IC.red; c.fillRect(0, 146, W, 4);
+    c.textBaseline = "alphabetic"; c.fillStyle = "#fff7ec"; c.font = "24px " + FP; c.fillText(fit(c, S.name || t("untitled"), 760), PAD + 6, 56);
+    if (job) { c.save(); c.imageSmoothingEnabled = false; c.drawImage(job, PAD + 6, 76, 28, 28); c.restore(); }
+    c.font = "bold 20px " + FB; c.fillStyle = IC.ink; c.fillText(D.classNames[c0.id] || c0.name, PAD + 44, 98);
+    c.font = "12px " + FU; c.fillStyle = IC.muted; c.fillText(("Midgard Survivors Guide · Build Planner · Patch " + D.v).toUpperCase(), PAD + 6, 130);
+    // equipment
+    var y0 = 150 + PAD, gw = 760, tw = W - PAD * 3 - gw;
+    box(c, PAD, y0, gw, topH, t("equipment").toUpperCase());
+    var cw = (gw - 36) / 2;
+    gearSlots.forEach(function (sl, i) {
+      var cx = PAD + 12 + (i % 2) * (cw + 12), cy = y0 + 38 + Math.floor(i / 2) * 64, g = S.gear[sl];
+      rr(c, cx, cy, cw, 56, 7, IC.panel2, g ? IC.r[D.items[g.id].r] : IC.border);
+      rr(c, cx + 8, cy + 8, 40, 40, 5, "#1f1e1b", IC.border);
+      c.textBaseline = "alphabetic"; c.font = "10px " + FU; c.fillStyle = IC.muted; c.fillText(slotName(sl).toUpperCase(), cx + 58, cy + 17);
+      if (!g) { c.font = "bold 14px " + FB; c.fillStyle = "#6f685b"; c.fillText(t("empty"), cx + 58, cy + 37); return; }
+      var it = D.items[g.id]; drawIcon(c, IM[it.ic], cx + 12, cy + 12, 32, false);
+      var cards = (g.cards || []).filter(function (x) { return D.cards[x]; }), cardsW = cards.length * 19;
+      c.font = "bold 14px " + FB; c.fillStyle = IC.ink; c.fillText(fit(c, it.n, cw - 66 - cardsW), cx + 58, cy + 35);
+      var bits = []; if (refinable(it) && g.refine) bits.push("+" + g.refine); if (gradable(it) && g.grade && (g.refine || 0) >= D.rules.gradeMinRefine) bits.push(D.weaponGrades[g.grade]);
+      if (g.trait && canTrait(g)) bits.push(L(D.traits[g.trait].n)); var pl = (g.pot || []).filter(function (l) { return l && l.k; }).length; if (pl) bits.push("SP " + pl + "/3");
+      c.font = "12px " + FB; c.fillStyle = IC.muted; c.fillText(fit(c, bits.join(" · "), cw - 66 - cardsW), cx + 58, cy + 50);
+      cards.forEach(function (cid, k) { var x = cx + cw - 8 - (cards.length - k) * 19; rr(c, x, cy + 14, 17, 24, 3, "#111", IC.border); drawIcon(c, IM[D.cards[cid].ic], x + 1, cy + 15, 22, true); });
+    });
+    // totals
+    var tx0 = PAD * 2 + gw; box(c, tx0, y0, tw, topH, t("totals").toUpperCase());
+    keys.forEach(function (k, i) {
+      var yy = y0 + 52 + i * 24; c.font = "13px " + FB; c.fillStyle = IC.ink; c.textBaseline = "alphabetic";
+      c.fillText(fit(c, labelOf(k), tw - 100), tx0 + 12, yy); c.font = "11px " + FU; c.fillStyle = IC.gold; var v = fmt(k, tot.all[k]); c.fillText(v, tx0 + tw - 12 - c.measureText(v).width, yy);
+      if (i < keys.length - 1) { c.fillStyle = "rgba(255,255,255,.05)"; c.fillRect(tx0 + 10, yy + 8, tw - 20, 1); }
+    });
+    if (tot.jb) { c.font = "12px " + FB; c.fillStyle = IC.muted; c.fillText(fit(c, t("classBonus") + ": +" + Math.round(tot.jb.dmg * 100) + "% / +" + Math.round(tot.jb.hp * 100) + "%" + (tot.jb.more !== 1 ? " · ×" + tot.jb.more : ""), tw - 24), tx0 + 12, y0 + topH - 14); }
+    // build pieces row
+    var y1 = y0 + topH + PAD, cols = [
+      [t("pacts"), (S.pacts || []).map(function (k) { return [D.pacts[k].ic, pactName(k)]; })],
+      [t("dishes"), (S.dishes || []).slice(0, S.chef || 1).map(function (k) { return [D.dishes[k].ic, D.dishes[k].n]; })],
+      [t("pet"), S.pet ? [[D.pets[S.pet].ic, D.pets[S.pet].n]] : []],
+      [t("album"), (S.album || []).slice(0, albumCap()).map(function (k) { return [D.cards[k].ic, D.cards[k].n, 1]; })],
+      [t("plag"), (S.plag || []).slice(0, plagCap()).map(function (k) { return [D.plag[k].ic, D.plag[k].n]; })]];
+    var bw2 = (W - PAD * 2 - 4 * 12) / 5;
+    cols.forEach(function (col, i) {
+      var bx = PAD + i * (bw2 + 12); box(c, bx, y1, bw2, 150, col[0].toUpperCase());
+      col[1].slice(0, 4).forEach(function (e, j) {
+        var yy = y1 + 38 + j * 27; rr(c, bx + 10, yy, 22, 22, 4, "#1f1e1b", IC.border); drawIcon(c, IM[e[0]], bx + 11, yy + 1, 20, !!e[2]);
+        c.font = "12.5px " + FB; c.fillStyle = IC.ink; c.textBaseline = "middle"; c.fillText(fit(c, e[1], bw2 - 50), bx + 38, yy + 12);
+      });
+      if (!col[1].length) { c.font = "12px " + FB; c.fillStyle = "#6f685b"; c.textBaseline = "middle"; c.fillText("—", bx + 12, y1 + 50); }
+    });
+    // priority + banishes
+    var y2 = y1 + 150 + PAD;
+    if (prioH) {
+      box(c, PAD, y2, W - PAD * 2, prioH, t("prio").toUpperCase());
+      var colW = (W - PAD * 2 - 36) / 2;
+      prio.forEach(function (pp, i) {
+        var col = i < prioRows ? 0 : 1, row = i < prioRows ? i : i - prioRows, xx = PAD + 12 + col * (colW + 12), yy = y2 + 38 + row * 26, x = upInfo(pp.id);
+        c.font = "11px " + FU; c.fillStyle = IC.muted; c.textBaseline = "middle"; c.fillText(String(i + 1), xx, yy + 10);
+        if (x.ic) { drawIcon(c, IM[x.ic], xx + 22, yy, 20, false); }
+        c.font = "bold 13px " + FB; c.fillStyle = IC.ink; c.fillText(fit(c, x.n, colW - 190), xx + 48, yy + 10);
+        var lim = pp.lim ? String(pp.lim) + (pp.ban ? "  ✕" : "") : t("noLimit"); c.font = "12px " + FB; c.fillStyle = pp.lim ? IC.gold : IC.muted;
+        c.fillText(lim, xx + colW - 12 - c.measureText(lim).width, yy + 10);
+      });
+      if (S.banish.length) {
+        var by = y2 + prioH - 34, bx2 = PAD + 12; c.font = "10px " + FU; c.fillStyle = IC.muted; c.textBaseline = "middle"; c.fillText(t("banish").toUpperCase(), bx2, by + 11); bx2 += c.measureText(t("banish").toUpperCase()).width + 12;
+        S.banish.forEach(function (k) {
+          var n = upInfo(k).n; c.font = "12px " + FB; var w = c.measureText(n).width + 30; if (bx2 + w > W - PAD - 12) return;
+          rr(c, bx2, by, w, 22, 5, IC.panel2, IC.red); c.fillStyle = IC.red; rr(c, bx2 + 1, by + 1, 18, 20, 4, IC.red); c.fillStyle = "#fff7ec"; c.font = "bold 12px " + FB; c.fillText("×", bx2 + 6, by + 11);
+          c.fillStyle = IC.ink; c.font = "12px " + FB; c.fillText(n, bx2 + 24, by + 11); bx2 += w + 6;
+        });
+      }
+    }
+    // footer
+    c.textBaseline = "middle"; c.font = "11px " + FU; c.fillStyle = IC.muted;
+    if (logo) { c.save(); c.imageSmoothingEnabled = false; c.drawImage(logo, PAD, H - 28, 30, 21); c.restore(); }
+    c.fillText("MIDGARDSURVIVORSGUIDE.GITHUB.IO/PLANNER", PAD + 38, H - 17);
+    return cv;
+  }
+  function openImage() {
+    modal = document.createElement("div"); modal.className = "pl-modal"; modal.setAttribute("role", "dialog"); modal.setAttribute("aria-modal", "true");
+    document.body.appendChild(modal); document.body.classList.add("pl-lock");
+    modal.addEventListener("click", function (e) { if (e.target === modal) closeEditor(); });
+    modal.innerHTML = '<div class="pl-mbox pl-imgbox"><div class="pl-mhead"><h2>' + t("imgTitle") + '</h2><button class="btn icon" type="button" data-x aria-label="' + t("done") + '">×</button></div><div class="pl-mbody"><p class="muted">' + t("making") + "</p></div></div>";
+    modal.querySelector("[data-x]").onclick = closeEditor;
+    makeImage().then(function (cv) {
+      if (!modal) return;
+      var url = cv.toDataURL("image/png"), name = (S.name || (D.classNames[S.cls] || S.cls)).replace(/[^\w\- ]+/g, "").trim().replace(/\s+/g, "-") || "build";
+      var body = modal.querySelector(".pl-mbody");
+      body.innerHTML = '<img class="pl-imgprev" src="' + url + '" alt=""><div class="pl-mfoot"><button class="btn" type="button" data-copy>' + t("copyImg") + '</button><a class="btn pl-primary" download="' + esc(name) + '.png" href="' + url + '">' + t("download") + "</a></div>";
+      var cb = body.querySelector("[data-copy]");
+      if (!(navigator.clipboard && window.ClipboardItem)) cb.style.display = "none";
+      cb.onclick = function () { cv.toBlob(function (b) { navigator.clipboard.write([new ClipboardItem({ "image/png": b })]).then(function () { flash(cb, t("imgCopied")); }, function () {}); }); };
+    });
   }
 
   /* ---------------- boot ---------------- */
