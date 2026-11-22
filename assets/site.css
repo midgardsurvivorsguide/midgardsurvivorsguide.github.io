@@ -53,7 +53,7 @@ b, strong { font-weight: 700; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 
 /* ---------- header ---------- */
-.site-header { position: sticky; top: 0; z-index: 20; background: var(--panel); border-bottom: var(--px) solid var(--border);
+.site-header { position: sticky; top: 0; z-index: 100; background: var(--panel); border-bottom: var(--px) solid var(--border);
   box-shadow: 0 3px 0 rgba(0,0,0,.12); }
 .site-header .in { max-width: 1240px; margin: 0 auto; height: var(--header-h); padding: 0 16px; display: flex; align-items: center; gap: 14px; }
 .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); flex: none; }
