@@ -220,7 +220,7 @@
   function add(o, k, v) { o[k] = (o[k] || 0) + v; }
   function itemTotals(slot, g) {
     var it = D.items[g.id], r = refinable(it) ? (g.refine || 0) : 0, m = {}, fx = {};
-    var mult = D.itemTiers[Math.max(0, Math.min(3, natSlots(g)))], grow = it.rf ? 1 + D.rules.refineStep * r : 1;
+    var mult = D.itemTiers[Math.max(0, Math.min(3, natSlots(g)))], grow = it.rg ? 1 + D.rules.refineStep * r : 1;
     var k;
     for (k in it.m || {}) { var v = it.m[k] * mult; if (it.hel && v > 0 && D.rules.helKeep.indexOf(k) < 0) v *= D.rules.helMult; add(m, k, v > 0 ? v * grow : v); }
     for (k in it.rf || {}) add(m, k, it.rf[k] * r);
@@ -242,7 +242,8 @@
       for (kk in c.fx || {}) add(fx, kk, c.fx[kk]);
     });
     if (it.s !== "soul" || soulOpen()) for (k in it.fx || {}) add(fx, k, it.fx[k]);
-    if (it.wings) { var wf = wingFx(r); for (k in wf) add(fx, k, wf[k]); }
+    if (it.wings) { var wf = wingFx(r); for (k in wf) add(fx, k, wf[k]);
+      if (wf.wing_card) (g.cards || []).forEach(function (cid) { var c = D.cards[cid]; if (c) for (var kk in c.fx || {}) if (c.fx[kk] > 0) add(fx, kk, c.fx[kk] * wf.wing_card); }); }
     if (g.trait && canTrait(g)) {
       var tr = D.traits[g.trait];
       if (tr) for (k in tr.fx) add(fx, k, tr.fx[k][traitTier(g) - 1]);
@@ -299,7 +300,7 @@
     function take(src, key, ic, n, d, always) {
       var k, odd = false;
       for (k in src.m || {}) { add(raw, k, src.m[k]); if (D.labels[k]) add(all, k, src.m[k]); else odd = true; }
-      for (k in src.fx || {}) { add(raw, k, src.fx[k]); if (/^(lg_|u_|wing_)/.test(k)) { if (!/^wing_/.test(k)) odd = true; } else if (!D.labels[k]) odd = true; else add(all, k, src.fx[k]); }
+      for (k in src.fx || {}) { add(raw, k, src.fx[k]); if (/^(lg_|u_)/.test(k)) odd = true; else if (D.labels[k]) add(all, k, src.fx[k]); else if (!/^wing_/.test(k)) odd = true; }
       if (odd || always) special(key, ic, n, d);
     }
     SLOT_ORDER.forEach(function (slot) {
@@ -318,6 +319,7 @@
     (S.pacts || []).forEach(function (k) { var p = D.pacts[k]; if (p) take(p, "p" + k, p.ic, pactName(k), L(p.d), !p.m && !p.fx); });
     (S.dishes || []).slice(0, S.chef || 1).forEach(function (k) { var d = D.dishes[k]; if (d) take(d, "d" + k, d.ic, d.n, L(d.d), true); });
     if (S.pet && D.pets[S.pet]) { var pt = D.pets[S.pet]; take(pt, "pet" + S.pet, pt.ic, pt.n, L(pt.d), !!pt.mvp); }
+    if (raw.status_dmg) ["poison_dmg", "bleed_dmg", "burn_power"].forEach(function (k) { add(all, k, raw.status_dmg); });
     return { all: all, raw: raw, specials: specials, sets: sets, harmony: hm.lv, jb: jb };
   }
   var STATS = ["str", "agi", "vit", "int", "dex", "luk"];
@@ -927,6 +929,12 @@
       cb.onclick = function () { cv.toBlob(function (b) { navigator.clipboard.write([new ClipboardItem({ "image/png": b })]).then(function () { flash(cb, t("imgCopied")); }, function () {}); }); };
     });
   }
+
+  if (/[?&]test/.test(location.search)) document.addEventListener("pl-test", function (e) {
+    var cases = JSON.parse(document.documentElement.getAttribute("data-pltest-in") || "[]"), o = S, out = [];
+    cases.forEach(function (st) { S = clean(st); out.push(buildTotals().all); }); S = o;
+    document.documentElement.setAttribute("data-pltest-out", JSON.stringify(out));
+  });
 
   /* ---------------- boot ---------------- */
   document.addEventListener("langchange", function () { if (!D) return; if (modal) drawEditor(); else render(); });
