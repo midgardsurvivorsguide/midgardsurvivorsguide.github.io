@@ -26,6 +26,24 @@
     dmgMore: ["Class damage multiplier", "Multiplicador de dano da classe", "Multiplicador de daño de clase", "職業傷害倍率"],
     statCap: ["Stat cap (full value)", "Limite de atributo (valor cheio)", "Límite de atributo (valor completo)", "能力值上限（全額）"],
     sets: ["Active sets", "Conjuntos ativos", "Conjuntos activos", "啟動的套裝"],
+    sk: ["Upgrade priority and banishes", "Prioridade de upgrades e banidos", "Prioridad de mejoras y destierros", "強化優先順序與放逐"],
+    prio: ["Upgrade priority", "Prioridade de upgrades", "Prioridad de mejoras", "強化優先順序"],
+    upgrade: ["Upgrade", "Upgrade", "Mejora", "強化"],
+    limit: ["Level limit", "Limite", "Límite", "上限"],
+    banLimit: ["Banish at limit", "Banir no limite", "Desterrar al límite", "達上限放逐"],
+    noLimit: ["no limit", "sem limite", "sin límite", "無上限"],
+    fill: ["Slots and evolutions first", "Slots e evoluções primeiro", "Ranuras y evoluciones primero", "優先欄位與進化"],
+    prioNote: ["The game takes the highest upgrade on this list that it offers you. Past level 10 each level is worth half, past 150 a quarter.", "O jogo pega o upgrade mais alto desta lista que aparecer. Depois do nível 10 cada nível vale metade, depois do 150 um quarto.", "El juego toma la mejora más alta de esta lista que te ofrezca. Pasado el nivel 10 cada nivel vale la mitad, pasado 150 un cuarto.", "遊戲會選擇此清單中最上方出現的強化。10 級後每級效果減半，150 級後剩四分之一。"],
+    banish: ["Banish (Holy Water)", "Banir (Holy Water)", "Desterrar (Holy Water)", "放逐（聖水）"],
+    holy: ["Holy Water upgrade", "Upgrade Holy Water", "Mejora Holy Water", "聖水強化"],
+    favs: ["Favourites", "Favoritos", "Favoritos", "最愛"],
+    favNote: ["Favourites show up twice as often.", "Favoritos aparecem duas vezes mais.", "Los favoritos aparecen el doble.", "最愛出現機率加倍。"],
+    pickUp: ["Add to priority", "Adicionar à prioridade", "Agregar a la prioridad", "加入優先順序"],
+    pickBan: ["Banish", "Banir", "Desterrar", "放逐"],
+    pickFav: ["Favourite", "Favorito", "Favorito", "最愛"],
+    banned: ["Banished", "Banido", "Desterrado", "已放逐"],
+    up: ["Move up", "Subir", "Subir", "上移"], down: ["Move down", "Descer", "Bajar", "下移"],
+    stat: ["Attribute", "Atributo", "Atributo", "能力值"], passive: ["Passive", "Passiva", "Pasiva", "被動"], active: ["Skill", "Skill", "Habilidad", "主動"],
     harmony: ["Refine harmony", "Harmonia de grade", "Armonía de grado", "等級和諧"],
     harmonyTxt: ["5+ graded armour pieces: every grade bonus counts", "5+ peças de armadura com grade: cada bônus de grade conta", "5+ piezas de armadura con grado: cada bono de grado cuenta", "5 件以上有等級的防具：等級加成額外計算"],
     soulOff: ["Soul slot opens on a reborn class (or a class that does not rebirth): this soul is not active yet.", "O slot de alma abre na classe renascida (ou que não renasce): esta alma ainda não está ativa.", "La ranura de alma se abre con la clase renacida (o que no renace): esta alma aún no está activa.", "靈魂欄位在職業轉生後開啟（或不轉生的職業）：此靈魂尚未生效。"],
@@ -292,6 +310,17 @@
     if (S.pet && D.pets[S.pet]) { var pt = D.pets[S.pet]; take(pt, "pet" + S.pet, pt.ic, pt.n, L(pt.d), !!pt.mvp); }
     return { all: all, raw: raw, specials: specials, sets: sets, harmony: hm.lv, jb: jb };
   }
+  var STATS = ["str", "agi", "vit", "int", "dex", "luk"];
+  function upInfo(id) {
+    if (STATS.indexOf(id) >= 0) return { n: id.toUpperCase(), ic: null, kind: "stat" };
+    var x = D.skills[id] || D.plag[id];
+    return x ? { n: x.n, ic: x.ic, kind: x.pas ? "passive" : "active", d: x.d } : null;
+  }
+  function upPool() {
+    var c = cls(), ids = (c.own || []).slice();
+    (S.plag || []).forEach(function (k) { if (ids.indexOf(k) < 0) ids.push(k); });
+    return ids.concat(STATS);
+  }
   function albumCap() { return D.rules.albumBase + (S.albumLv || 0); }
   function plagCap() { return cls().rogue ? D.rules.plagRogue : D.rules.plagAny; }
   function plagOptions() { var own = cls().own || []; return Object.keys(D.plag).filter(function (k) { return own.indexOf(k) < 0; }); }
@@ -304,7 +333,7 @@
   function labelOf(k) { return D.labels[k] ? L(D.labels[k].n) : k.replace(/_/g, " "); }
 
   /* ---------------- state ---------------- */
-  function fresh(c) { return { v: 1, cls: c, name: "", reborn: true, towerTop: 100, gear: {}, pacts: [], dishes: [], chef: D.rules.chefMax, pet: "", album: [], albumLv: D.rules.albumUpgrades, plag: [] }; }
+  function fresh(c) { return { v: 1, cls: c, name: "", reborn: true, towerTop: 100, gear: {}, pacts: [], dishes: [], chef: D.rules.chefMax, pet: "", album: [], albumLv: D.rules.albumUpgrades, plag: [], prio: [], banish: [], favs: [], holy: D.rules.holyMax, fill: true }; }
   function persist() { try { localStorage.setItem(LS_CUR, JSON.stringify(S)); } catch (e) {} }
   function savedList() { try { return JSON.parse(localStorage.getItem(LS_SAVED) || "[]"); } catch (e) { return []; } }
   function setSaved(a) { try { localStorage.setItem(LS_SAVED, JSON.stringify(a)); } catch (e) {} }
@@ -319,7 +348,11 @@
     return { v: 1, cls: o.cls, name: String(o.name || "").slice(0, 60), reborn: !!o.reborn, towerTop: Math.max(0, Math.min(D.rules.towerGearTop, o.towerTop !== undefined ? +o.towerTop || 0 : Math.max.apply(null, [0].concat(o.tower || [])))), gear: g,
       pacts: uniq(o.pacts, D.pacts, D.rules.maxPacts), dishes: uniq(o.dishes, D.dishes, D.rules.chefMax), chef: chef, pet: D.pets[o.pet] ? o.pet : "",
       albumLv: Math.max(0, Math.min(D.rules.albumUpgrades, o.albumLv === undefined ? D.rules.albumUpgrades : +o.albumLv)),
-      album: uniq(o.album, D.cards, D.rules.albumBase + D.rules.albumUpgrades), plag: uniq(o.plag, D.plag, D.rules.plagRogue) };
+      album: uniq(o.album, D.cards, D.rules.albumBase + D.rules.albumUpgrades), plag: uniq(o.plag, D.plag, D.rules.plagRogue),
+      prio: (o.prio || []).filter(function (x, i, a) { return x && upInfo(x.id) && a.map(function (y) { return y && y.id; }).indexOf(x.id) === i; }).map(function (x) { return { id: x.id, lim: Math.max(0, Math.min(999, +x.lim || 0)), ban: !!x.ban }; }),
+      banish: (o.banish || []).filter(function (x, i, a) { return upInfo(x) && a.indexOf(x) === i; }).slice(0, D.rules.holyMax),
+      favs: (o.favs || []).filter(function (x, i, a) { return upInfo(x) && a.indexOf(x) === i; }).slice(0, D.rules.favMax),
+      holy: Math.max(0, Math.min(D.rules.holyMax, o.holy === undefined ? D.rules.holyMax : +o.holy)), fill: o.fill === undefined ? true : !!o.fill };
   }
 
   /* ---------------- rendering ---------------- */
@@ -372,7 +405,7 @@
       '<p class="pl-note muted">' + t("countNote") + "</p></section>" + savedHtml() + "</div>";
     var doll = SLOT_ORDER.filter(function (s) { return s !== "shield" || c.shield || c.dual; }).map(slotCard).join("");
     var center = '<div class="pl-col pl-center"><section class="pl-box"><h2>' + t("equipment") + '</h2><div class="pl-doll">' + doll + "</div>" +
-      (c.dual ? '<p class="pl-note muted">' + t("leftHalf") + "</p>" : "") + "</section>" + apHtml() + ppdHtml() + "</div>";
+      (c.dual ? '<p class="pl-note muted">' + t("leftHalf") + "</p>" : "") + "</section>" + apHtml() + ppdHtml() + skHtml() + "</div>";
     var rows = Object.keys(D.labels).filter(function (k) { return tot.all[k] && Math.abs(tot.all[k]) > 1e-9; })
       .map(function (k) { return "<tr><td>" + esc(labelOf(k)) + '</td><td class="n">' + fmt(k, tot.all[k]) + "</td></tr>"; }).join("");
     var extra = "";
@@ -410,6 +443,29 @@
       "<h3>" + t("album") + ' <b class="pl-cap">' + Math.min((S.album || []).length, cap) + "/" + cap + "</b></h3>" +
       '<label class="pl-chef">' + t("albumLv") + ' <select data-act="albumlv">' + lv + '</select></label><div class="pl-chips">' + cards + '</div><p class="pl-note muted">' + t("albumNote") + "</p>" +
       "<h3>" + t("plag") + ' <b class="pl-cap">' + Math.min((S.plag || []).length, pc) + "/" + pc + '</b></h3><div class="pl-chips">' + plags + '</div><p class="pl-note muted">' + (cls().rogue ? t("plagRogue") : t("plagAny")) + "</p></section>";
+  }
+  function upIcon(id) { var x = upInfo(id); return x && x.ic ? ico(x.ic, "pl-mini pl-skic") : '<span class="pl-stat" aria-hidden="true">◆</span>'; }
+  function skHtml() {
+    var pool = upPool(), prio = (S.prio || []).filter(function (p) { return pool.indexOf(p.id) >= 0; });
+    var rows = prio.map(function (p, i) {
+      var x = upInfo(p.id), bad = (S.banish || []).indexOf(p.id) >= 0;
+      return '<tr' + (bad ? ' class="pl-bad"' : "") + '><td class="n">' + (i + 1) + "</td><td>" + upIcon(p.id) + " <b>" + esc(x.n) + "</b>" + (bad ? ' <small class="muted">(' + t("banned") + ")</small>" : "") + "</td>" +
+        '<td><input class="pl-lim" type="number" min="0" max="999" placeholder="' + esc(t("noLimit")) + '" value="' + (p.lim || "") + '" data-lim="' + i + '"></td>' +
+        '<td class="n"><input type="checkbox" data-ban="' + i + '"' + (p.ban ? " checked" : "") + (p.lim ? "" : " disabled") + "></td>" +
+        '<td class="pl-move"><button type="button" class="btn" data-mv="' + i + ':-1" aria-label="' + t("up") + '"' + (i ? "" : " disabled") + '>▲</button><button type="button" class="btn" data-mv="' + i + ':1" aria-label="' + t("down") + '"' + (i < prio.length - 1 ? "" : " disabled") + '>▼</button><button type="button" class="btn" data-rm="' + i + '" aria-label="' + t("del") + '">×</button></td></tr>';
+    }).join("");
+    var left = prio.length < pool.length ? '<button class="pl-chip pl-add" type="button" data-add="prio">+ ' + t("pickUp") + "</button>" : "";
+    var bans = (S.banish || []).filter(function (k) { return pool.indexOf(k) >= 0; }).map(function (k) { var x = upInfo(k); return '<button class="pill x pl-banpill" type="button" data-unban="' + k + '">' + esc(x.n) + "</button>"; }).join("");
+    var hv = ""; for (var i = 0; i <= D.rules.holyMax; i++) hv += '<option value="' + i + '"' + (i === (S.holy || 0) ? " selected" : "") + ">" + i + "</option>";
+    var favs = (S.favs || []).map(function (k) { var x = upInfo(k); return chip("fav", k, x.ic, x.n, ""); }).join("");
+    if ((S.favs || []).length < D.rules.favMax) favs += addBtn("fav");
+    return '<section class="pl-box"><h2>' + t("sk") + '</h2><div class="two prio pl-sk"><div>' +
+      "<h3>" + t("prio") + '</h3><label class="pl-chk"><input type="checkbox" data-act="fill"' + (S.fill ? " checked" : "") + "> " + t("fill") + "</label>" +
+      '<div class="tw"><table class="pl-prio"><thead><tr><th>#</th><th>' + t("upgrade") + "</th><th>" + t("limit") + "</th><th>" + t("banLimit") + "</th><th></th></tr></thead><tbody>" + rows + "</tbody></table></div>" + left +
+      '<p class="pl-note muted">' + t("prioNote") + "</p></div><div>" +
+      "<h3>" + t("banish") + ' <b class="pl-cap">' + (S.banish || []).length + "/" + (S.holy || 0) + '</b></h3><label class="pl-chef">' + t("holy") + ' <select data-act="holy">' + hv + "</select></label>" +
+      '<div class="pills">' + bans + ((S.banish || []).length < (S.holy || 0) ? '<button class="pill pl-add-pill" type="button" data-add="ban">+ ' + t("pickBan") + "</button>" : "") + "</div>" +
+      "<h3>" + t("favs") + ' <b class="pl-cap">' + (S.favs || []).length + "/" + D.rules.favMax + '</b></h3><div class="pl-chips">' + favs + '</div><p class="pl-note muted">' + t("favNote") + "</p></div></div></section>";
   }
   function ppdHtml() {
     var mp = D.rules.maxPacts, chef = S.chef || 1;
@@ -463,6 +519,17 @@
     root.querySelectorAll("[data-album]").forEach(function (b) { b.onclick = function () { S.album = S.album.filter(function (x) { return x !== b.getAttribute("data-album"); }); persist(); render(); }; });
     root.querySelectorAll("[data-plag]").forEach(function (b) { b.onclick = function () { S.plag = S.plag.filter(function (x) { return x !== b.getAttribute("data-plag"); }); persist(); render(); }; });
     var al = q('[data-act="albumlv"]'); if (al) al.onchange = function () { S.albumLv = +al.value; S.album = S.album.slice(0, albumCap()); persist(); render(); };
+    var fillB = q('[data-act="fill"]'); if (fillB) fillB.onchange = function () { S.fill = fillB.checked; persist(); };
+    var hol = q('[data-act="holy"]'); if (hol) hol.onchange = function () { S.holy = +hol.value; S.banish = S.banish.slice(0, S.holy); persist(); render(); };
+    var visible = function () { var pool = upPool(); return S.prio.filter(function (p) { return pool.indexOf(p.id) >= 0; }); };
+    root.querySelectorAll("[data-lim]").forEach(function (inp) { inp.onchange = function () { var p = visible()[+inp.getAttribute("data-lim")]; p.lim = Math.max(0, Math.min(999, +inp.value || 0)); if (!p.lim) p.ban = false; persist(); render(); }; });
+    root.querySelectorAll("[data-ban]").forEach(function (cb) { cb.onchange = function () { visible()[+cb.getAttribute("data-ban")].ban = cb.checked; persist(); }; });
+    root.querySelectorAll("[data-mv]").forEach(function (b) { b.onclick = function () {
+      var v = visible(), a = b.getAttribute("data-mv").split(":"), i = +a[0], j = i + (+a[1]); if (j < 0 || j >= v.length) return;
+      var ia = S.prio.indexOf(v[i]), ib = S.prio.indexOf(v[j]), tmp = S.prio[ia]; S.prio[ia] = S.prio[ib]; S.prio[ib] = tmp; persist(); render(); }; });
+    root.querySelectorAll("[data-rm]").forEach(function (b) { b.onclick = function () { var p = visible()[+b.getAttribute("data-rm")]; S.prio.splice(S.prio.indexOf(p), 1); persist(); render(); }; });
+    root.querySelectorAll("[data-unban]").forEach(function (b) { b.onclick = function () { S.banish = S.banish.filter(function (x) { return x !== b.getAttribute("data-unban"); }); persist(); render(); }; });
+    root.querySelectorAll("[data-fav]").forEach(function (b) { b.onclick = function () { S.favs = S.favs.filter(function (x) { return x !== b.getAttribute("data-fav"); }); persist(); render(); }; });
     var ch = q('[data-act="chef"]'); if (ch) ch.onchange = function () { S.chef = +ch.value; S.dishes = S.dishes.slice(0, S.chef); persist(); render(); };
     root.querySelectorAll("[data-load]").forEach(function (b) { b.onclick = function () { var x = savedList()[+b.getAttribute("data-load")]; if (x && valid(x.data)) { S = clean(x.data); persist(); render(); window.scrollTo(0, 0); } }; });
     root.querySelectorAll("[data-del]").forEach(function (b) { b.onclick = function () { var a = savedList(); a.splice(+b.getAttribute("data-del"), 1); setSaved(a); render(); }; });
@@ -493,7 +560,32 @@
     if (g) wireItem(slot, g); else wireList(slot);
   }
 
+  function drawUpPick(kind) {
+    var pool = upPool(), title = t(kind === "prio" ? "pickUp" : kind === "ban" ? "pickBan" : "pickFav");
+    var taken = kind === "prio" ? S.prio.map(function (p) { return p.id; }) : kind === "ban" ? S.banish : S.favs;
+    var row = function (id) {
+      var x = upInfo(id), off = taken.indexOf(id) >= 0 || (kind === "fav" && S.banish.indexOf(id) >= 0) || (kind === "ban" && S.favs.indexOf(id) >= 0);
+      return '<button type="button" class="pl-opt' + (off ? " blocked" : "") + '" data-k="' + id + '">' + (x.ic ? ico(x.ic) : '<span class="pl-ic pl-stat">' + esc(x.n) + "</span>") +
+        "<span><b>" + esc(x.n) + "</b><small>" + t(x.kind === "stat" ? "stat" : x.kind) + (off ? " · " + t("taken") : "") + "</small>" + (x.d ? "<em>" + esc(L(x.d)) + "</em>" : "") + "</span></button>";
+    };
+    var groups = [["active", pool.filter(function (k) { return upInfo(k).kind === "active"; })], ["passive", pool.filter(function (k) { return upInfo(k).kind === "passive"; })], ["stat", STATS]];
+    var list = groups.map(function (g) { return g[1].length ? '<h3 class="pl-group">' + t(g[0]) + "</h3>" + g[1].map(row).join("") : ""; }).join("");
+    modal.innerHTML = '<div class="pl-mbox"><div class="pl-mhead"><h2>' + esc(title) + '</h2><button class="btn icon" type="button" data-x aria-label="' + t("done") + '">×</button></div><div class="pl-mbody"><div class="pl-opts">' + list + "</div></div></div>";
+    modal.querySelector("[data-x]").onclick = closeEditor;
+    modal.querySelectorAll(".pl-opt").forEach(function (b) {
+      b.onclick = function () {
+        if (b.classList.contains("blocked")) return;
+        var id = b.getAttribute("data-k");
+        if (kind === "prio") S.prio.push({ id: id, lim: 0, ban: false });
+        else if (kind === "ban" && S.banish.length < S.holy) S.banish.push(id);
+        else if (kind === "fav" && S.favs.length < D.rules.favMax) S.favs.push(id);
+        persist();
+        if (kind === "prio") drawUpPick(kind); else closeEditor();
+      };
+    });
+  }
   function drawPick(kind) {
+    if (kind === "prio" || kind === "ban" || kind === "fav") return drawUpPick(kind);
     var src = kind === "pact" ? D.pacts : kind === "dish" ? D.dishes : kind === "album" ? D.cards : kind === "plag" ? D.plag : D.pets;
     var chosen = kind === "pact" ? S.pacts : kind === "dish" ? S.dishes : kind === "album" ? S.album : kind === "plag" ? S.plag : (S.pet ? [S.pet] : []);
     var title = t(kind === "pact" ? "pickPact" : kind === "dish" ? "pickDish" : kind === "album" ? "pickCard" : kind === "plag" ? "pickPlag" : "pickPet");
