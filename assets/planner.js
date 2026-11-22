@@ -20,7 +20,15 @@
     base: ["Base", "Base", "Base", "基礎"],
     reborn: ["Class reborn (Valkyrie)", "Classe renascida (Valkyrie)", "Clase renacida (Valkyrie)", "職業已轉生（Valkyrie）"],
     noReborn: ["This class does not rebirth: +1 already included", "Esta classe não renasce: +1 já incluso", "Esta clase no renace: +1 ya incluido", "此職業不轉生：已含 +1"],
-    tower: ["Endless Tower floors", "Andares da Endless Tower", "Pisos de la Endless Tower", "無盡之塔樓層"],
+    tower: ["Endless Tower: highest floor", "Endless Tower: andar mais alto", "Endless Tower: piso más alto", "無盡之塔：最高樓層"],
+    towerNote: ["Legend floors (20, 40, 60, 80, 100) give legendary sockets; power floors (10, 30…) +10% damage and HP each.", "Andares de lenda (20, 40, 60, 80, 100) dão slots lendários; andares de poder (10, 30…) +10% de dano e vida cada.", "Los pisos de leyenda (20, 40, 60, 80, 100) dan ranuras legendarias; los de poder (10, 30…) +10% de daño y vida cada uno.", "傳說樓層（20、40、60、80、100）給傳說欄位；力量樓層（10、30…）每層 +10% 傷害與生命。"],
+    classBonus: ["Class bonus", "Bônus da classe", "Bono de clase", "職業加成"],
+    dmgMore: ["Class damage multiplier", "Multiplicador de dano da classe", "Multiplicador de daño de clase", "職業傷害倍率"],
+    statCap: ["Stat cap (full value)", "Limite de atributo (valor cheio)", "Límite de atributo (valor completo)", "能力值上限（全額）"],
+    sets: ["Active sets", "Conjuntos ativos", "Conjuntos activos", "啟動的套裝"],
+    harmony: ["Refine harmony", "Harmonia de grade", "Armonía de grado", "等級和諧"],
+    harmonyTxt: ["5+ graded armour pieces: every grade bonus counts", "5+ peças de armadura com grade: cada bônus de grade conta", "5+ piezas de armadura con grado: cada bono de grado cuenta", "5 件以上有等級的防具：等級加成額外計算"],
+    soulOff: ["Soul slot opens on a reborn class (or a class that does not rebirth): this soul is not active yet.", "O slot de alma abre na classe renascida (ou que não renasce): esta alma ainda não está ativa.", "La ranura de alma se abre con la clase renacida (o que no renace): esta alma aún no está activa.", "靈魂欄位在職業轉生後開啟（或不轉生的職業）：此靈魂尚未生效。"],
     allOpen: ["All legendary sockets unlocked", "Todos os slots lendários liberados", "Todas las ranuras legendarias liberadas", "全部傳說欄位已解鎖"],
     legend: ["Legendary", "Lendários", "Legendarios", "傳說"],
     unique: ["Unique", "Únicos", "Únicos", "唯一"],
@@ -139,8 +147,10 @@
   function isUnique(it) { return it.r === "u" || (it.r === "s" && it.u); }
   function legendCap() {
     var c = cls(), r = D.rules;
-    return r.legendBase + ((S.reborn || c.no_rebirth) ? r.legendRebirth : 0) + S.tower.length;
+    return r.legendBase + ((S.reborn || c.no_rebirth) ? r.legendRebirth : 0) + towerCount("legend");
   }
+  function towerCount(kind) { return D.rules.towerRewards.filter(function (x) { return x[1] === kind && x[0] <= (S.towerTop || 0); }).length; }
+  function soulOpen() { return !!(S.reborn || cls().no_rebirth); }
   function counts(skip) {
     var n = { l: 0, u: 0 };
     SLOT_ORDER.forEach(function (k) {
@@ -184,14 +194,14 @@
     var it = D.items[g.id], r = refinable(it) ? (g.refine || 0) : 0, m = {}, fx = {};
     var mult = D.itemTiers[Math.max(0, Math.min(3, natSlots(g)))], grow = it.rf ? 1 + D.rules.refineStep * r : 1;
     var k;
-    for (k in it.m || {}) { var v = it.m[k] * mult; add(m, k, v > 0 ? v * grow : v); }
+    for (k in it.m || {}) { var v = it.m[k] * mult; if (it.hel && v > 0 && D.rules.helKeep.indexOf(k) < 0) v *= D.rules.helMult; add(m, k, v > 0 ? v * grow : v); }
     for (k in it.rf || {}) add(m, k, it.rf[k] * r);
     if (it.s === "weapon" && r > (it.safe || 0)) add(m, "dmg", D.rules.overDmg * (r - it.safe));
     (g.pot || []).forEach(function (l) {
       if (!l || !l.k) return; var p = D.pot[l.k]; if (!p) return;
       var val = p.v[Math.min(p.v.length - 1, Math.max(0, (l.t || 1) - 1))];
       if (p.mod) add(m, p.mod, val);
-      (p.fx || []).forEach(function (e) { add(fx, e, val); });
+      (p.fx || []).forEach(function (e) { add(fx, e, val * (it.th ? 1 + D.rules.twoHandBonus : 1)); });
     });
     if (it.th) for (k in m) if (m[k] > 0) m[k] *= 1 + D.rules.twoHandBonus;
     var gr = gradable(it) && r >= D.rules.gradeMinRefine ? (g.grade || 0) : 0;
@@ -203,7 +213,8 @@
       for (var kk in c.m || {}) add(m, kk, c.m[kk] > 0 ? c.m[kk] * ck : c.m[kk]);
       for (kk in c.fx || {}) add(fx, kk, c.fx[kk]);
     });
-    for (k in it.fx || {}) add(fx, k, it.fx[k]);
+    if (it.s !== "soul" || soulOpen()) for (k in it.fx || {}) add(fx, k, it.fx[k]);
+    if (it.wings) { var wf = wingFx(r); for (k in wf) add(fx, k, wf[k]); }
     if (g.trait && canTrait(g)) {
       var tr = D.traits[g.trait];
       if (tr) for (k in tr.fx) add(fx, k, tr.fx[k][traitTier(g) - 1]);
@@ -211,13 +222,56 @@
     if (slot === "shield" && it.s === "weapon") for (k in m) m[k] *= D.rules.offhandShare;
     return { m: m, fx: fx };
   }
+  function wingFx(r) {
+    var f = {}, cap = (r >= 1 ? 2 : 0) + (r >= 4 ? 2 : 0) + (r >= 10 ? 5 : 0);
+    if (cap) f.wing_stat_cap = cap;
+    if (r >= 2) f.wing_stun = 1; if (r >= 3) f.wing_card = r >= 8 ? 0.3 : 0.15; if (r >= 5) f.wing_ymir = 0.5;
+    if (r >= 6) f.wing_break_cd = 0.3; if (r >= 7) f.wing_fill = 0.25; if (r >= 9) f.wing_broken = 0.2;
+    return f;
+  }
+  function harmony() {
+    var n = 0, low = 99;
+    D.rules.harmonySlots.forEach(function (k) {
+      var g = S.gear[k]; if (!g) return; var it = D.items[g.id];
+      if (!it || it.s === "weapon" || !D.gearGrades[it.s] || (it.s === "low" && it.face)) return;
+      n++; var gr = (g.refine || 0) >= D.rules.gradeMinRefine ? (g.grade || 0) : 0; if (gr < low) low = gr;
+    });
+    var lv = n >= D.rules.harmonyMin && low < 99 ? low : 0, out = {};
+    if (lv > 0) {
+      var share = D.rules.harmonyShare[Math.min(lv, D.rules.harmonyShare.length - 1)];
+      D.rules.harmonySlots.forEach(function (k) {
+        var g = S.gear[k]; if (!g) return; var it = D.items[g.id], gr = (g.refine || 0) >= D.rules.gradeMinRefine ? (g.grade || 0) : 0;
+        if (!it || it.s === "weapon" || !D.gearGrades[it.s] || gr <= 0) return;
+        var gg = D.gearGrades[it.s]; gg.keys.forEach(function (kk) { add(out, kk, gg.vals[gr] * share); });
+      });
+    }
+    return { lv: lv, m: out };
+  }
+  function activeSets() {
+    var have = {}, cards = (S.album || []).slice(0, albumCap()).slice();
+    for (var k in S.gear) { var g = S.gear[k]; if (!g) continue; have[g.id] = 1; if (D.items[g.id] && D.items[g.id].base) have[D.items[g.id].base] = 1; (g.cards || []).forEach(function (c) { if (c) cards.push(c); }); }
+    var out = [];
+    for (var id in D.sets) {
+      var st = D.sets[id];
+      if (st.more) {
+        var worn = st.items.concat(st.more).filter(function (i) { return have[i]; }).length;
+        if (worn >= 2) out.push({ id: id, full: false });
+        if (worn >= 4) out.push({ id: id, full: true });
+        continue;
+      }
+      var ok = st.items.every(function (i) { return have[i]; }) && (st.cards || []).every(function (c) { return cards.indexOf(c) >= 0; });
+      if (ok) out.push({ id: id, full: false });
+    }
+    return out;
+  }
+  function jobBonus() { var c = cls(); return (S.reborn && c.jbT) || c.jb || null; }
   function buildTotals() {
-    var all = {}, specials = [], seen = {};
+    var all = {}, raw = {}, specials = [], seen = {};
     function special(key, ic, n, d) { if (!seen[key] && d) { seen[key] = 1; specials.push({ ic: ic, n: n, d: d }); } }
     function take(src, key, ic, n, d, always) {
       var k, odd = false;
-      for (k in src.m || {}) { if (D.labels[k]) add(all, k, src.m[k]); else odd = true; }
-      for (k in src.fx || {}) { if (/^(lg_|u_)/.test(k) || !D.labels[k]) odd = true; else add(all, k, src.fx[k]); }
+      for (k in src.m || {}) { add(raw, k, src.m[k]); if (D.labels[k]) add(all, k, src.m[k]); else odd = true; }
+      for (k in src.fx || {}) { add(raw, k, src.fx[k]); if (/^(lg_|u_|wing_)/.test(k)) { if (!/^wing_/.test(k)) odd = true; } else if (!D.labels[k]) odd = true; else add(all, k, src.fx[k]); }
       if (odd || always) special(key, ic, n, d);
     }
     SLOT_ORDER.forEach(function (slot) {
@@ -225,11 +279,18 @@
       var it = D.items[g.id], r = itemTotals(slot, g);
       take({ m: r.m, fx: r.fx }, "i" + g.id, it.ic, it.n, L(it.d));
     });
+    var hm = harmony(); for (var hk in hm.m) add(all, hk, hm.m[hk]);
+    var sets = activeSets();
+    sets.forEach(function (x) { var st = D.sets[x.id]; take({ m: x.full ? st.fm : st.m, fx: x.full ? st.ffx : st.fx }, "set" + x.id + x.full, null, L(st.n) + (x.full ? " (4)" : ""), L(x.full ? st.fd : st.d), true); });
+    var jb = jobBonus(); if (jb) { add(all, "dmg", jb.dmg); add(all, "max_hp_pct", jb.hp); }
+    var pw = towerCount("power") * D.rules.towerPower; if (pw) { add(all, "dmg", pw); add(all, "max_hp_pct", pw); }
+    var tens = Math.min(S.towerTop || 0, D.rules.towerGearTop) / D.rules.towerTier;
+    if (raw.tower_dmg) add(all, "dmg", raw.tower_dmg * tens); if (raw.tower_hp) add(all, "max_hp_pct", raw.tower_hp * tens);
     (S.album || []).slice(0, albumCap()).forEach(function (cid) { var c = D.cards[cid]; if (c) take(c, "c" + cid, c.ic, c.n, L(c.d)); });
     (S.pacts || []).forEach(function (k) { var p = D.pacts[k]; if (p) take(p, "p" + k, p.ic, pactName(k), L(p.d), !p.m && !p.fx); });
     (S.dishes || []).slice(0, S.chef || 1).forEach(function (k) { var d = D.dishes[k]; if (d) take(d, "d" + k, d.ic, d.n, L(d.d), true); });
     if (S.pet && D.pets[S.pet]) { var pt = D.pets[S.pet]; take(pt, "pet" + S.pet, pt.ic, pt.n, L(pt.d), !!pt.mvp); }
-    return { all: all, specials: specials };
+    return { all: all, raw: raw, specials: specials, sets: sets, harmony: hm.lv, jb: jb };
   }
   function albumCap() { return D.rules.albumBase + (S.albumLv || 0); }
   function plagCap() { return cls().rogue ? D.rules.plagRogue : D.rules.plagAny; }
@@ -243,7 +304,7 @@
   function labelOf(k) { return D.labels[k] ? L(D.labels[k].n) : k.replace(/_/g, " "); }
 
   /* ---------------- state ---------------- */
-  function fresh(c) { return { v: 1, cls: c, name: "", reborn: true, tower: D.rules.towerFloors.slice(), gear: {}, pacts: [], dishes: [], chef: D.rules.chefMax, pet: "", album: [], albumLv: D.rules.albumUpgrades, plag: [] }; }
+  function fresh(c) { return { v: 1, cls: c, name: "", reborn: true, towerTop: 100, gear: {}, pacts: [], dishes: [], chef: D.rules.chefMax, pet: "", album: [], albumLv: D.rules.albumUpgrades, plag: [] }; }
   function persist() { try { localStorage.setItem(LS_CUR, JSON.stringify(S)); } catch (e) {} }
   function savedList() { try { return JSON.parse(localStorage.getItem(LS_SAVED) || "[]"); } catch (e) { return []; } }
   function setSaved(a) { try { localStorage.setItem(LS_SAVED, JSON.stringify(a)); } catch (e) {} }
@@ -255,7 +316,7 @@
     for (var k in o.gear || {}) if (SLOT_ORDER.indexOf(k) >= 0 && o.gear[k] && D.items[o.gear[k].id]) g[k] = o.gear[k];
     var uniq = function (a, src, n) { var out = []; (a || []).forEach(function (x) { if (src[x] && out.indexOf(x) < 0 && out.length < n) out.push(x); }); return out; };
     var chef = Math.max(1, Math.min(D.rules.chefMax, +o.chef || D.rules.chefMax));
-    return { v: 1, cls: o.cls, name: String(o.name || "").slice(0, 60), reborn: !!o.reborn, tower: (o.tower || []).filter(function (f) { return D.rules.towerFloors.indexOf(f) >= 0; }), gear: g,
+    return { v: 1, cls: o.cls, name: String(o.name || "").slice(0, 60), reborn: !!o.reborn, towerTop: Math.max(0, Math.min(D.rules.towerGearTop, o.towerTop !== undefined ? +o.towerTop || 0 : Math.max.apply(null, [0].concat(o.tower || [])))), gear: g,
       pacts: uniq(o.pacts, D.pacts, D.rules.maxPacts), dishes: uniq(o.dishes, D.dishes, D.rules.chefMax), chef: chef, pet: D.pets[o.pet] ? o.pet : "",
       albumLv: Math.max(0, Math.min(D.rules.albumUpgrades, o.albumLv === undefined ? D.rules.albumUpgrades : +o.albumLv)),
       album: uniq(o.album, D.cards, D.rules.albumBase + D.rules.albumUpgrades), plag: uniq(o.plag, D.plag, D.rules.plagRogue) };
@@ -296,9 +357,8 @@
   function render() {
     if (!S) return renderPicker();
     var c = cls(), n = counts(), cap = legendCap(), tot = buildTotals();
-    var towers = D.rules.towerFloors.map(function (f) {
-      return '<label class="pl-chk"><input type="checkbox" data-floor="' + f + '"' + (S.tower.indexOf(f) >= 0 ? " checked" : "") + "> " + f + "</label>";
-    }).join("");
+    var tops = ""; for (var fl = 0; fl <= D.rules.towerGearTop; fl += 10) tops += '<option value="' + fl + '"' + (fl === (S.towerTop || 0) ? " selected" : "") + ">" + fl + "</option>";
+    var towers = '<select data-act="tower">' + tops + "</select>";
     var left = '<div class="pl-col"><section class="pl-box"><h2>' + t("setup") + '</h2>' +
       '<div class="pl-cur" style="background-image:url(' + BASE + "../assets/banners/class-" + c.id + '.png)"><span><img src="' + BASE + "../assets/icons/job_" + c.id + '.png" alt="">' + esc(D.classNames[c.id] || c.name) + '</span></div>' +
       '<button class="btn pl-wide" type="button" data-act="change">' + t("change") + '</button>' +
@@ -306,7 +366,7 @@
       '<h3>' + t("sockets") + ' <b class="pl-cap">' + cap + "</b></h3>" +
       '<p class="pl-row muted">' + t("base") + ": " + D.rules.legendBase + "</p>" +
       (c.no_rebirth ? '<p class="pl-row muted">' + t("noReborn") + "</p>" : '<label class="pl-chk"><input type="checkbox" data-act="reborn"' + (S.reborn ? " checked" : "") + "> " + t("reborn") + " (+" + D.rules.legendRebirth + ")</label>") +
-      '<p class="pl-row">' + t("tower") + ':</p><div class="pl-towers">' + towers + "</div>" +
+      '<label class="pl-chef">' + t("tower") + " " + towers + '</label><p class="pl-note muted">' + t("towerNote") + "</p>" +
       '<button class="btn pl-wide pl-allopen" type="button" data-act="allopen">' + t("allOpen") + "</button>" +
       '<div class="pl-counters"><span class="' + (n.l > cap ? "bad" : "") + '">' + t("legend") + " <b>" + n.l + "/" + cap + '</b></span><span>' + t("unique") + " <b>" + n.u + "/" + D.rules.uniqueMax + '</b></span><span>' + t("soul") + " <b>" + (S.gear.soul ? 1 : 0) + "/1</b></span></div>" +
       '<p class="pl-note muted">' + t("countNote") + "</p></section>" + savedHtml() + "</div>";
@@ -316,9 +376,15 @@
     var rows = Object.keys(D.labels).filter(function (k) { return tot.all[k] && Math.abs(tot.all[k]) > 1e-9; })
       .map(function (k) { return "<tr><td>" + esc(labelOf(k)) + '</td><td class="n">' + fmt(k, tot.all[k]) + "</td></tr>"; }).join("");
     var extra = "";
+    var jbx = tot.jb;
+    if (jbx && jbx.more && jbx.more !== 1) extra += "<tr><td>" + t("dmgMore") + '</td><td class="n">×' + jbx.more + "</td></tr>";
+    extra += "<tr><td>" + t("statCap") + '</td><td class="n">' + (D.rules.maxStat + (tot.raw.wing_stat_cap || 0)) + "</td></tr>";
+    if (tot.harmony) extra += "<tr><td>" + t("harmony") + '</td><td class="n">' + D.weaponGrades[tot.harmony] + "</td></tr>";
     var specials = tot.specials.map(function (x) { return "<li>" + ico(x.ic, "pl-mini") + "<span><b>" + esc(x.n) + "</b> " + esc(x.d) + "</span></li>"; }).join("");
     var right = '<div class="pl-col pl-right"><section class="pl-box pl-sticky"><h2>' + t("totals") + "</h2>" +
       (rows || extra ? '<div class="tw"><table><tbody>' + rows + extra + "</tbody></table></div>" : '<p class="muted">' + t("empty") + "</p>") +
+      (jbx ? '<p class="pl-note">' + t("classBonus") + ": +" + Math.round(jbx.dmg * 100) + "% " + esc(labelOf("dmg")) + ", +" + Math.round(jbx.hp * 100) + "% " + esc(labelOf("max_hp_pct")) + (jbx.more !== 1 ? ", ×" + jbx.more : "") + "</p>" : "") +
+      (S.gear.soul && !soulOpen() ? '<p class="pl-note bad-note">' + t("soulOff") + "</p>" : "") +
       (specials ? "<h3>" + t("effects") + '</h3><ul class="pl-specials">' + specials + "</ul>" : "") +
       '<p class="pl-note muted">' + t("totalsNote") + "</p>" +
       '<button class="btn pl-wide pl-primary" type="button" data-act="save">' + t("save") + '</button>' +
@@ -374,10 +440,8 @@
     q('[data-act="change"]').onclick = function () { S = null; render(); };
     q(".pl-name").oninput = function (e) { S.name = e.target.value; persist(); };
     var rb = q('[data-act="reborn"]'); if (rb) rb.onchange = function (e) { S.reborn = e.target.checked; persist(); render(); };
-    root.querySelectorAll("[data-floor]").forEach(function (cb) {
-      cb.onchange = function () { var f = +cb.getAttribute("data-floor"); S.tower = S.tower.filter(function (x) { return x !== f; }); if (cb.checked) S.tower.push(f); S.tower.sort(function (a, b) { return a - b; }); persist(); render(); };
-    });
-    q('[data-act="allopen"]').onclick = function () { S.reborn = true; S.tower = D.rules.towerFloors.slice(); persist(); render(); };
+    var tw = q('[data-act="tower"]'); if (tw) tw.onchange = function () { S.towerTop = +tw.value; persist(); render(); };
+    q('[data-act="allopen"]').onclick = function () { S.reborn = true; S.towerTop = Math.max(S.towerTop || 0, 100); persist(); render(); };
     q('[data-act="save"]').onclick = function () {
       var a = savedList(), name = S.name || t("untitled"), i = a.map(function (b) { return b.name; }).indexOf(name);
       var entry = { name: name, data: JSON.parse(JSON.stringify(S)), at: Date.now() };

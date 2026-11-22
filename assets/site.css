@@ -689,3 +689,5 @@ section, .card, .hero, .rail-box, .shot, .video { overflow: hidden; }
 .sub-btn.lv-beginner b { color: var(--lv-beg); } .sub-btn.lv-intermediate b { color: var(--lv-int); } .sub-btn.lv-advanced b { color: var(--lv-adv); }
 html:not(.dark) .sub-btn.lv-beginner b { color: #23733a; } html:not(.dark) .sub-btn.lv-intermediate b { color: #5b34c2; } html:not(.dark) .sub-btn.lv-advanced b { color: #8a6210; }
 .dotlv.lv-intermediate { background: var(--lv-int); } .dotlv.lv-beginner { background: var(--lv-beg); } .dotlv.lv-advanced { background: var(--lv-adv); }
+
+.bad-note { background: var(--bad-bg); border: 2px solid var(--red); border-radius: 6px; padding: 6px 8px; }
