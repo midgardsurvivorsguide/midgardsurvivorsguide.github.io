@@ -68,7 +68,22 @@
     leftHand: ["Left hand", "Mão esquerda", "Mano izquierda", "左手"],
     countNote: ["Souls are legendary too and count toward the limit, as in the game.", "Almas também são lendárias e contam no limite, como no jogo.", "Las almas también son legendarias y cuentan en el límite, como en el juego.", "靈魂也算傳說裝備並計入上限，與遊戲相同。"],
     noResults: ["Nothing fits this slot for this class.", "Nada serve neste slot para esta classe.", "Nada sirve en esta ranura para esta clase.", "此職業沒有適合這個欄位的裝備。"],
-    untitled: ["Untitled build", "Build sem nome", "Build sin nombre", "未命名配裝"]
+    untitled: ["Untitled build", "Build sem nome", "Build sin nombre", "未命名配裝"],
+    ppd: ["Pacts, dishes and pet", "Pactos, pratos e pet", "Pactos, platos y mascota", "契約、料理與寵物"],
+    pacts: ["Pacts", "Pactos", "Pactos", "契約"],
+    dishes: ["Dishes", "Pratos", "Platos", "料理"],
+    pet: ["Pet", "Pet", "Mascota", "寵物"],
+    chef: ["Chef level", "Nível do Chef", "Nivel del Chef", "廚師等級"],
+    chefNote: ["Each Chef level (Prontera) lets you bring one more dish.", "Cada nível do Chef (Prontera) libera mais um prato.", "Cada nivel del Chef (Prontera) permite un plato más.", "廚師（普隆德拉）每升一級可多帶一道料理。"],
+    pactNote: ["Up to 3 pacts, valid in every run of the class.", "Até 3 pactos, valem em todas as runs da classe.", "Hasta 3 pactos, valen en todas las partidas de la clase.", "最多 3 個契約，該職業每場遊戲都有效。"],
+    add: ["Add", "Adicionar", "Agregar", "新增"],
+    pickPact: ["Choose a pact", "Escolha um pacto", "Elige un pacto", "選擇契約"],
+    pickDish: ["Choose a dish", "Escolha um prato", "Elige un plato", "選擇料理"],
+    pickPet: ["Choose a pet", "Escolha um pet", "Elige una mascota", "選擇寵物"],
+    taken: ["Already chosen", "Já escolhido", "Ya elegido", "已選擇"],
+    full: ["All slots used", "Todos os espaços usados", "Todos los espacios usados", "已滿"],
+    mvpPet: ["MVP pet", "Pet de MVP", "Mascota MVP", "MVP 寵物"],
+    skill: ["Skill", "Skill", "Habilidad", "技能"]
   };
   var LI = { en: 0, pt: 1, es: 2, zh: 3 };
   function lang() { var l = document.documentElement.getAttribute("data-ui"); return LI[l] !== undefined ? l : "en"; }
@@ -187,21 +202,25 @@
     return { m: m, fx: fx };
   }
   function buildTotals() {
-    var m = {}, fx = {}, specials = [];
+    var all = {}, specials = [], seen = {};
+    function special(key, ic, n, d) { if (!seen[key] && d) { seen[key] = 1; specials.push({ ic: ic, n: n, d: d }); } }
+    function take(src, key, ic, n, d, always) {
+      var k, odd = false;
+      for (k in src.m || {}) { if (D.labels[k]) add(all, k, src.m[k]); else odd = true; }
+      for (k in src.fx || {}) { if (/^(lg_|u_)/.test(k) || !D.labels[k]) odd = true; else add(all, k, src.fx[k]); }
+      if (odd || always) special(key, ic, n, d);
+    }
     SLOT_ORDER.forEach(function (slot) {
       var g = S.gear[slot]; if (!g) return;
-      var r = itemTotals(slot, g), k;
-      for (k in r.m) add(m, k, r.m[k]);
-      for (k in r.fx) {
-        if (/^(lg_|u_)/.test(k) || !D.labels[k]) { if (D.items[g.id].d && specials.indexOf(g.id) < 0 && /^(lg_|u_)/.test(k)) specials.push(g.id); if (/^(lg_|u_)/.test(k)) continue; }
-        add(fx, k, r.fx[k]);
-      }
+      var it = D.items[g.id], r = itemTotals(slot, g);
+      take({ m: r.m, fx: r.fx }, "i" + g.id, it.ic, it.n, L(it.d));
     });
-    var all = {}; var k2;
-    for (k2 in m) add(all, k2, m[k2]);
-    for (k2 in fx) add(all, k2, fx[k2]);
+    (S.pacts || []).forEach(function (k) { var p = D.pacts[k]; if (p) take(p, "p" + k, p.ic, pactName(k), L(p.d), !p.m && !p.fx); });
+    (S.dishes || []).slice(0, S.chef || 1).forEach(function (k) { var d = D.dishes[k]; if (d) take(d, "d" + k, d.ic, d.n, L(d.d), true); });
+    if (S.pet && D.pets[S.pet]) { var pt = D.pets[S.pet]; take(pt, "pet" + S.pet, pt.ic, pt.n, L(pt.d), !!pt.mvp); }
     return { all: all, specials: specials };
   }
+  function pactName(k) { var n = D.pacts[k].n; if (!n) return k; var en = n.en.replace(/^Pact of (the )?/i, "").replace(/ Pact$/, ""); en = en.charAt(0).toUpperCase() + en.slice(1); return lang() === "en" ? en : en + " (" + L(n) + ")"; }
   function fmt(k, v) {
     var lab = D.labels[k], pct = lab ? lab.pct : Math.abs(v) < 5;
     if (pct) { var p = Math.round(v * 1000) / 10; return (p > 0 ? "+" : "") + p + "%"; }
@@ -210,7 +229,7 @@
   function labelOf(k) { return D.labels[k] ? L(D.labels[k].n) : k.replace(/_/g, " "); }
 
   /* ---------------- state ---------------- */
-  function fresh(c) { return { v: 1, cls: c, name: "", reborn: true, tower: D.rules.towerFloors.slice(), gear: {} }; }
+  function fresh(c) { return { v: 1, cls: c, name: "", reborn: true, tower: D.rules.towerFloors.slice(), gear: {}, pacts: [], dishes: [], chef: D.rules.chefMax, pet: "" }; }
   function persist() { try { localStorage.setItem(LS_CUR, JSON.stringify(S)); } catch (e) {} }
   function savedList() { try { return JSON.parse(localStorage.getItem(LS_SAVED) || "[]"); } catch (e) { return []; } }
   function setSaved(a) { try { localStorage.setItem(LS_SAVED, JSON.stringify(a)); } catch (e) {} }
@@ -220,7 +239,10 @@
   function clean(o) {
     var g = {};
     for (var k in o.gear || {}) if (SLOT_ORDER.indexOf(k) >= 0 && o.gear[k] && D.items[o.gear[k].id]) g[k] = o.gear[k];
-    return { v: 1, cls: o.cls, name: String(o.name || "").slice(0, 60), reborn: !!o.reborn, tower: (o.tower || []).filter(function (f) { return D.rules.towerFloors.indexOf(f) >= 0; }), gear: g };
+    var uniq = function (a, src, n) { var out = []; (a || []).forEach(function (x) { if (src[x] && out.indexOf(x) < 0 && out.length < n) out.push(x); }); return out; };
+    var chef = Math.max(1, Math.min(D.rules.chefMax, +o.chef || D.rules.chefMax));
+    return { v: 1, cls: o.cls, name: String(o.name || "").slice(0, 60), reborn: !!o.reborn, tower: (o.tower || []).filter(function (f) { return D.rules.towerFloors.indexOf(f) >= 0; }), gear: g,
+      pacts: uniq(o.pacts, D.pacts, D.rules.maxPacts), dishes: uniq(o.dishes, D.dishes, D.rules.chefMax), chef: chef, pet: D.pets[o.pet] ? o.pet : "" };
   }
 
   /* ---------------- rendering ---------------- */
@@ -274,12 +296,11 @@
       '<p class="pl-note muted">' + t("countNote") + "</p></section>" + savedHtml() + "</div>";
     var doll = SLOT_ORDER.filter(function (s) { return s !== "shield" || c.shield || c.dual; }).map(slotCard).join("");
     var center = '<div class="pl-col pl-center"><section class="pl-box"><h2>' + t("equipment") + '</h2><div class="pl-doll">' + doll + "</div>" +
-      (c.dual ? '<p class="pl-note muted">' + t("leftHalf") + "</p>" : "") + "</section></div>";
+      (c.dual ? '<p class="pl-note muted">' + t("leftHalf") + "</p>" : "") + "</section>" + ppdHtml() + "</div>";
     var rows = Object.keys(D.labels).filter(function (k) { return tot.all[k] && Math.abs(tot.all[k]) > 1e-9; })
       .map(function (k) { return "<tr><td>" + esc(labelOf(k)) + '</td><td class="n">' + fmt(k, tot.all[k]) + "</td></tr>"; }).join("");
-    var extra = Object.keys(tot.all).filter(function (k) { return !D.labels[k] && Math.abs(tot.all[k]) > 1e-9 && !/^(lg_|u_)/.test(k); })
-      .map(function (k) { return "<tr><td>" + esc(labelOf(k)) + '</td><td class="n">' + fmt(k, tot.all[k]) + "</td></tr>"; }).join("");
-    var specials = tot.specials.map(function (id) { var it = D.items[id]; return '<li>' + ico(it.ic, "pl-mini") + "<b>" + esc(it.n) + "</b> " + esc(L(it.d)) + "</li>"; }).join("");
+    var extra = "";
+    var specials = tot.specials.map(function (x) { return "<li>" + ico(x.ic, "pl-mini") + "<span><b>" + esc(x.n) + "</b> " + esc(x.d) + "</span></li>"; }).join("");
     var right = '<div class="pl-col pl-right"><section class="pl-box pl-sticky"><h2>' + t("totals") + "</h2>" +
       (rows || extra ? '<div class="tw"><table><tbody>' + rows + extra + "</tbody></table></div>" : '<p class="muted">' + t("empty") + "</p>") +
       (specials ? "<h3>" + t("effects") + '</h3><ul class="pl-specials">' + specials + "</ul>" : "") +
@@ -291,6 +312,23 @@
     wire();
   }
 
+  function chip(kind, key, ic, n, sub) {
+    return '<button class="pl-chip" type="button" data-' + kind + '="' + key + '">' + ico(ic, "pl-chip-ic") + '<span><b>' + esc(n) + "</b>" + (sub ? "<small>" + esc(sub) + "</small>" : "") + '</span><i aria-hidden="true">×</i></button>';
+  }
+  function addBtn(kind) { return '<button class="pl-chip pl-add" type="button" data-add="' + kind + '">+ ' + t("add") + "</button>"; }
+  function ppdHtml() {
+    var mp = D.rules.maxPacts, chef = S.chef || 1;
+    var pacts = (S.pacts || []).map(function (k) { var tab = D.pactTabs.filter(function (x) { return x.id === D.pacts[k].tab; })[0]; return chip("pact", k, D.pacts[k].ic, pactName(k), tab ? L(tab.n) : ""); }).join("");
+    if ((S.pacts || []).length < mp) pacts += addBtn("pact");
+    var dishes = (S.dishes || []).slice(0, chef).map(function (k) { return chip("dish", k, D.dishes[k].ic, D.dishes[k].n, ""); }).join("");
+    if ((S.dishes || []).length < chef) dishes += addBtn("dish");
+    var pet = S.pet ? chip("pet", S.pet, D.pets[S.pet].ic, D.pets[S.pet].n, D.pets[S.pet].mvp ? t("mvpPet") : "") : addBtn("pet");
+    return '<section class="pl-box"><h2>' + t("ppd") + "</h2>" +
+      "<h3>" + t("pacts") + ' <b class="pl-cap">' + (S.pacts || []).length + "/" + mp + '</b></h3><div class="pl-chips">' + pacts + '</div><p class="pl-note muted">' + t("pactNote") + "</p>" +
+      "<h3>" + t("dishes") + ' <b class="pl-cap">' + Math.min((S.dishes || []).length, chef) + "/" + chef + '</b></h3>' +
+      '<label class="pl-chef">' + t("chef") + ' <select data-act="chef">' + opts(1, D.rules.chefMax, chef) + '</select></label><div class="pl-chips">' + dishes + '</div><p class="pl-note muted">' + t("chefNote") + "</p>" +
+      "<h3>" + t("pet") + '</h3><div class="pl-chips">' + pet + "</div></section>";
+  }
   function savedHtml() {
     var a = savedList();
     var list = a.length ? a.map(function (b, i) {
@@ -325,6 +363,11 @@
       else prompt(t("share"), url);
     };
     q('[data-act="reset"]').onclick = function () { S.gear = {}; persist(); render(); };
+    root.querySelectorAll("[data-pact]").forEach(function (b) { b.onclick = function () { S.pacts = S.pacts.filter(function (x) { return x !== b.getAttribute("data-pact"); }); persist(); render(); }; });
+    root.querySelectorAll("[data-dish]").forEach(function (b) { b.onclick = function () { S.dishes = S.dishes.filter(function (x) { return x !== b.getAttribute("data-dish"); }); persist(); render(); }; });
+    root.querySelectorAll("[data-pet]").forEach(function (b) { b.onclick = function () { S.pet = ""; persist(); render(); }; });
+    root.querySelectorAll("[data-add]").forEach(function (b) { b.onclick = function () { openEditor("@" + b.getAttribute("data-add")); }; });
+    var ch = q('[data-act="chef"]'); if (ch) ch.onchange = function () { S.chef = +ch.value; S.dishes = S.dishes.slice(0, S.chef); persist(); render(); };
     root.querySelectorAll("[data-load]").forEach(function (b) { b.onclick = function () { var x = savedList()[+b.getAttribute("data-load")]; if (x && valid(x.data)) { S = clean(x.data); persist(); render(); window.scrollTo(0, 0); } }; });
     root.querySelectorAll("[data-del]").forEach(function (b) { b.onclick = function () { var a = savedList(); a.splice(+b.getAttribute("data-del"), 1); setSaved(a); render(); }; });
   }
@@ -344,7 +387,9 @@
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && modal) closeEditor(); });
 
   function drawEditor() {
-    var slot = editSlot, g = S.gear[slot];
+    var slot = editSlot;
+    if (slot.charAt(0) === "@") return drawPick(slot.slice(1));
+    var g = S.gear[slot];
     var head = '<div class="pl-mhead"><h2>' + esc(slotName(slot)) + '</h2><button class="btn icon" type="button" data-x aria-label="' + t("done") + '">×</button></div>';
     var body = g ? editItemHtml(slot, g) : listHtml(slot);
     modal.innerHTML = '<div class="pl-mbox">' + head + '<div class="pl-mbody">' + body + "</div></div>";
@@ -352,6 +397,47 @@
     if (g) wireItem(slot, g); else wireList(slot);
   }
 
+  function drawPick(kind) {
+    var src = kind === "pact" ? D.pacts : kind === "dish" ? D.dishes : D.pets;
+    var chosen = kind === "pact" ? S.pacts : kind === "dish" ? S.dishes : (S.pet ? [S.pet] : []);
+    var title = t(kind === "pact" ? "pickPact" : kind === "dish" ? "pickDish" : "pickPet");
+    var q = filt.q.toLowerCase();
+    var keys = Object.keys(src).filter(function (k) { var n = kind === "pact" ? pactName(k) : src[k].n; return !q || n.toLowerCase().indexOf(q) >= 0 || L(src[k].d).toLowerCase().indexOf(q) >= 0; });
+    var row = function (k) {
+      var x = src[k], taken = chosen.indexOf(k) >= 0, n = kind === "pact" ? pactName(k) : x.n;
+      var sub = kind === "pet" && x.mvp ? t("mvpPet") + (x.sk ? " · " + t("skill") + ": " + L(x.sk) : "") : "";
+      return '<button type="button" class="pl-opt' + (taken ? " blocked" : "") + (x.mvp ? " r-l" : "") + '" data-k="' + k + '"' + (taken ? ' aria-disabled="true"' : "") + ">" + ico(x.ic) +
+        "<span><b>" + esc(n) + "</b>" + (sub || taken ? "<small>" + esc(sub) + (taken ? (sub ? " · " : "") + t("taken") : "") + "</small>" : "") + (x.d ? "<em>" + esc(L(x.d)) + "</em>" : "") + "</span></button>";
+    };
+    var list = "";
+    if (kind === "pact") {
+      D.pactTabs.forEach(function (tab) {
+        var ks = keys.filter(function (k) { return src[k].tab === tab.id; }); if (!ks.length) return;
+        list += '<h3 class="pl-group">' + esc(L(tab.n)) + "</h3>" + ks.map(row).join("");
+      });
+      var rest = keys.filter(function (k) { return !D.pactTabs.some(function (tb) { return tb.id === src[k].tab; }); });
+      if (rest.length) list += '<h3 class="pl-group">—</h3>' + rest.map(row).join("");
+    } else {
+      keys.sort(function (a, b) { return ((src[b].mvp || 0) - (src[a].mvp || 0)) || src[a].n.localeCompare(src[b].n); });
+      list = keys.map(row).join("");
+    }
+    modal.innerHTML = '<div class="pl-mbox"><div class="pl-mhead"><h2>' + esc(title) + '</h2><button class="btn icon" type="button" data-x aria-label="' + t("done") + '">×</button></div>' +
+      '<div class="pl-mbody"><div class="pl-filter"><input type="search" placeholder="' + esc(t("search")) + '" value="' + esc(filt.q) + '"></div><div class="pl-opts">' + list + "</div></div></div>";
+    modal.querySelector("[data-x]").onclick = closeEditor;
+    var inp = modal.querySelector(".pl-filter input");
+    inp.oninput = function () { filt.q = inp.value; var pos = inp.selectionStart; drawPick(kind); var n2 = modal.querySelector(".pl-filter input"); n2.focus(); n2.setSelectionRange(pos, pos); };
+    modal.querySelectorAll(".pl-opt").forEach(function (b) {
+      b.onclick = function () {
+        if (b.classList.contains("blocked")) return;
+        var k = b.getAttribute("data-k");
+        if (kind === "pact" && S.pacts.length < D.rules.maxPacts) S.pacts.push(k);
+        else if (kind === "dish" && S.dishes.length < (S.chef || 1)) S.dishes.push(k);
+        else if (kind === "pet") S.pet = k;
+        persist(); closeEditor();
+      };
+    });
+    setTimeout(function () { inp.focus(); }, 0);
+  }
   function listHtml(slot) {
     var ids = Object.keys(D.items).filter(function (id) { return fitsSlot(slot, id); });
     var rarOrder = { n: 0, p: 1, l: 2, u: 3, s: 4 };
