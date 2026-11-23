@@ -202,7 +202,8 @@
 
   /* ---------------- per-item rules ---------------- */
   function slotless(it) { return it.s === "soul" || (it.s === "low" && it.face); }
-  function natSlots(g) { var it = D.items[g.id]; return it.fs !== undefined ? it.fs : (slotless(it) ? 0 : (g.slots || 0)); }
+  function noRoll(it) { return it.r === "l" || it.r === "u" || !!it.wings; }   // legendaries, uniques and Tower wings drop with 0 slots (Equipment.make(id, 0))
+  function natSlots(g) { var it = D.items[g.id]; return it.fs !== undefined ? it.fs : (slotless(it) || noRoll(it) ? 0 : (g.slots || 0)); }
   function sockets(g) {
     var it = D.items[g.id];
     if (slotless(it)) return 0;
@@ -701,7 +702,7 @@
       b.onclick = function () {
         if (b.classList.contains("blocked")) return;
         var id = b.getAttribute("data-id"), it = D.items[id];
-        S.gear[slot] = { id: id, refine: refinable(it) ? D.rules.maxRefine : 0, slots: it.fs !== undefined ? it.fs : (slotless(it) ? 0 : D.rules.naturalSlots), extra: 0, cards: [], pot: [] };
+        S.gear[slot] = { id: id, refine: refinable(it) ? D.rules.maxRefine : 0, slots: it.fs !== undefined ? it.fs : (slotless(it) || noRoll(it) ? 0 : D.rules.naturalSlots), extra: noRoll(it) && !slotless(it) ? extraCap(it) : 0, cards: [], pot: [] };
         if (slot === "weapon" && it.th && S.gear.shield) delete S.gear.shield;
         persist(); drawEditor();
       };
@@ -719,7 +720,7 @@
     if (slot === "shield" && it.s === "weapon") h += '<p class="pl-note muted">' + t("leftHalf") + "</p>";
     var grid = "";
     if (refinable(it)) grid += '<label>' + t("refine") + '<select data-f="refine">' + opts(0, D.rules.maxRefine, g.refine || 0, function (i) { return "+" + i; }) + "</select></label>";
-    if (!slotless(it) && it.fs === undefined) grid += '<label>' + t("slotsNat") + '<select data-f="slots">' + opts(0, D.rules.naturalSlots, g.slots || 0) + "</select></label>";
+    if (!slotless(it) && it.fs === undefined && !noRoll(it)) grid += '<label>' + t("slotsNat") + '<select data-f="slots">' + opts(0, D.rules.naturalSlots, g.slots || 0) + "</select></label>";
     if (extraCap(it)) grid += '<label>' + t("slotsExtra") + '<select data-f="extra">' + opts(0, extraCap(it), g.extra || 0, function (i) { return "+" + i; }) + "</select></label>";
     if (gradable(it)) {
       var gnames = it.s === "weapon" ? D.weaponGrades : ["—", "D", "C", "B", "A", "S"];
