@@ -10,6 +10,7 @@
 .i-card_eddga{background-image:url(icons/card_eddga.jpg)}
 .i-card_explosion{background-image:url(icons/card_explosion.png)}
 .i-card_high_orc{background-image:url(icons/card_high_orc.png)}
+.i-card_hodremlin{background-image:url(icons/card_hodremlin.jpg)}
 .i-card_isis{background-image:url(icons/card_isis.png)}
 .i-card_katrinn{background-image:url(icons/card_katrinn.jpg)}
 .i-card_knight_of_windstorm{background-image:url(icons/card_knight_of_windstorm.jpg)}
@@ -26,6 +27,7 @@
 .i-card_tarou{background-image:url(icons/card_tarou.png)}
 .i-card_thanatos{background-image:url(icons/card_thanatos.jpg)}
 .i-card_thief_bug{background-image:url(icons/card_thief_bug.jpg)}
+.i-card_turtle_champion{background-image:url(icons/card_turtle_champion.jpg)}
 .i-card_vanberk{background-image:url(icons/card_vanberk.png)}
 .i-card_vitata{background-image:url(icons/card_vitata.jpg)}
 .i-dish_desert_scorpions{background-image:url(icons/dish_desert_scorpions.png)}
@@ -43,6 +45,7 @@
 .i-item_belt{background-image:url(icons/item_belt.png)}
 .i-item_berserk_knuckle{background-image:url(icons/item_berserk_knuckle.jpg)}
 .i-item_blood_boots{background-image:url(icons/item_blood_boots.png)}
+.i-item_boots{background-image:url(icons/item_boots.jpg)}
 .i-item_bow_thimble{background-image:url(icons/item_bow_thimble.png)}
 .i-item_bradium_earring{background-image:url(icons/item_bradium_earring.jpg)}
 .i-item_bradium_helm{background-image:url(icons/item_bradium_helm.jpg)}
@@ -51,11 +54,14 @@
 .i-item_diabolus_manteau{background-image:url(icons/item_diabolus_manteau.jpg)}
 .i-item_diabolus_ring{background-image:url(icons/item_diabolus_ring.jpg)}
 .i-item_earring{background-image:url(icons/item_earring.jpg)}
+.i-item_elven_ears{background-image:url(icons/item_elven_ears.jpg)}
 .i-item_fish_in_mouth{background-image:url(icons/item_fish_in_mouth.png)}
+.i-item_flame_lord_crown{background-image:url(icons/item_flame_lord_crown.jpg)}
 .i-item_full_plate{background-image:url(icons/item_full_plate.jpg)}
 .i-item_gem_emperium{background-image:url(icons/item_gem_emperium.png)}
 .i-item_glacial_heart{background-image:url(icons/item_glacial_heart.png)}
 .i-item_glove{background-image:url(icons/item_glove.jpg)}
+.i-item_golden_bug_shell{background-image:url(icons/item_golden_bug_shell.jpg)}
 .i-item_guard{background-image:url(icons/item_guard.jpg)}
 .i-item_heavenly_maiden_robe{background-image:url(icons/item_heavenly_maiden_robe.jpg)}
 .i-item_high_heels{background-image:url(icons/item_high_heels.png)}
@@ -63,6 +69,7 @@
 .i-item_huuma_giant_wheel{background-image:url(icons/item_huuma_giant_wheel.jpg)}
 .i-item_kagekiri{background-image:url(icons/item_kagekiri.png)}
 .i-item_kamaitachi{background-image:url(icons/item_kamaitachi.png)}
+.i-item_manteau{background-image:url(icons/item_manteau.jpg)}
 .i-item_monocle{background-image:url(icons/item_monocle.png)}
 .i-item_morning_star{background-image:url(icons/item_morning_star.jpg)}
 .i-item_odin_blessing{background-image:url(icons/item_odin_blessing.jpg)}
@@ -72,10 +79,14 @@
 .i-item_osiris_ankh{background-image:url(icons/item_osiris_ankh.jpg)}
 .i-item_pauldron{background-image:url(icons/item_pauldron.png)}
 .i-item_pet_egg{background-image:url(icons/item_pet_egg.png)}
+.i-item_phoenix_mantle{background-image:url(icons/item_phoenix_mantle.jpg)}
+.i-item_pipe{background-image:url(icons/item_pipe.jpg)}
 .i-item_quadrille{background-image:url(icons/item_quadrille.jpg)}
 .i-item_ribbon{background-image:url(icons/item_ribbon.jpg)}
 .i-item_ring{background-image:url(icons/item_ring.png)}
+.i-item_ring_flame_lord{background-image:url(icons/item_ring_flame_lord.jpg)}
 .i-item_rosary{background-image:url(icons/item_rosary.jpg)}
+.i-item_saints_robe{background-image:url(icons/item_saints_robe.jpg)}
 .i-item_soul_quadrille{background-image:url(icons/item_soul_quadrille.jpg)}
 .i-item_stunner{background-image:url(icons/item_stunner.jpg)}
 .i-item_sunglasses{background-image:url(icons/item_sunglasses.jpg)}
@@ -121,7 +132,12 @@
 .i-pact_overload{background-image:url(icons/pact_overload.jpg)}
 .i-pact_vengeance{background-image:url(icons/pact_vengeance.jpg)}
 .i-pet_cookie_xmas{background-image:url(icons/pet_cookie_xmas.jpg)}
+.i-pet_drainliar{background-image:url(icons/pet_drainliar.jpg)}
 .i-pet_fallen_bishop{background-image:url(icons/pet_fallen_bishop.jpg)}
+.i-pet_randgris_fallen{background-image:url(icons/pet_randgris_fallen.jpg)}
+.i-pet_turtle_general{background-image:url(icons/pet_turtle_general.jpg)}
+.i-skill_aspersio{background-image:url(icons/skill_aspersio.jpg)}
+.i-skill_assumptio{background-image:url(icons/skill_assumptio.jpg)}
 .i-skill_asura_strike{background-image:url(icons/skill_asura_strike.jpg)}
 .i-skill_aura_blade{background-image:url(icons/skill_aura_blade.jpg)}
 .i-skill_blessing{background-image:url(icons/skill_blessing.jpg)}
@@ -147,6 +163,8 @@
 .i-skill_kunai_splash{background-image:url(icons/skill_kunai_splash.png)}
 .i-skill_left_hand_mastery{background-image:url(icons/skill_left_hand_mastery.png)}
 .i-skill_lex_aeterna{background-image:url(icons/skill_lex_aeterna.jpg)}
+.i-skill_mace_mastery{background-image:url(icons/skill_mace_mastery.jpg)}
+.i-skill_magnus_exorcismus{background-image:url(icons/skill_magnus_exorcismus.jpg)}
 .i-skill_meikyou_shisui{background-image:url(icons/skill_meikyou_shisui.png)}
 .i-skill_meltdown{background-image:url(icons/skill_meltdown.jpg)}
 .i-skill_mirror_image{background-image:url(icons/skill_mirror_image.png)}

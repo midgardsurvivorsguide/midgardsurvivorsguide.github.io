@@ -62,6 +62,8 @@
     dupDone: ["Copy created and saved", "Cópia criada e salva", "Copia creada y guardada", "已建立並儲存副本"],
     copyOf: ["copy", "cópia", "copia", "副本"],
     dupShort: ["Copy", "Copiar", "Copiar", "複製"],
+    element: ["Element (Narakusa)", "Elemento (Narakusa)", "Elemento (Narakusa)", "屬性（Narakusa）"],
+    elOrig: ["Original", "Original", "Original", "原本"],
     harmony: ["Refine harmony", "Harmonia de grade", "Armonía de grado", "等級和諧"],
     harmonyTxt: ["5+ graded armour pieces: every grade bonus counts", "5+ peças de armadura com grade: cada bônus de grade conta", "5+ piezas de armadura con grado: cada bono de grado cuenta", "5 件以上有等級的防具：等級加成額外計算"],
     soulOff: ["Soul slot opens on a reborn class (or a class that does not rebirth): this soul is not active yet.", "O slot de alma abre na classe renascida (ou que não renasce): esta alma ainda não está ativa.", "La ranura de alma se abre con la clase renacida (o que no renace): esta alma aún no está activa.", "靈魂欄位在職業轉生後開啟（或不轉生的職業）：此靈魂尚未生效。"],
@@ -151,6 +153,60 @@
     upFull: ["Account upgrades (Kafra, Sage...) at max", "Upgrades da conta (Kafra, Sage...) no máximo", "Mejoras de cuenta (Kafra, Sage...) al máximo", "帳號強化（Kafra、Sage…）全滿"],
     stew: ["Extra HP from Immortal Stew", "HP extra do Immortal Stew", "HP extra de Immortal Stew", "Immortal Stew 額外 HP"],
     sheet: ["Character sheet", "Ficha do personagem", "Ficha del personaje", "角色數據"],
+    sim: ["Simulate DPS", "Simular DPS", "Simular DPS", "模擬 DPS"],
+    simTarget: ["Target", "Alvo", "Objetivo", "目標"],
+    simPath: ["Run path", "Caminho da run", "Ruta de la partida", "路線"],
+    simDark: ["Niflheim (Hel): more damage", "Niflheim (Hel): mais dano", "Niflheim (Hel): más daño", "尼芙爾海姆（Hel）：更多傷害"],
+    simLight: ["Valhalla: more life", "Valhalla: mais vida", "Valhalla: más vida", "英靈殿：更多生命"],
+    simMin: ["Run time (minutes)", "Tempo de run (minutos)", "Tiempo de partida (minutos)", "遊戲時間（分鐘）"],
+    simAcct: ["Use my numbers from Character and account", "Usar meus números de Personagem e conta", "Usar mis números de Personaje y cuenta", "使用角色與帳號中的數值"],
+    simGo: ["Simulate", "Simular", "Simular", "模擬"],
+    simEmp: ["Emperiums (60 s Festival)", "Emperiums (Festival de 60 s)", "Emperiums (Festival de 60 s)", "Emperium（60 秒祭典）"],
+    simDps: ["DPS", "DPS", "DPS", "DPS"],
+    simTotal: ["Damage in 60 s", "Dano em 60 s", "Daño en 60 s", "60 秒傷害"],
+    simWeapon: ["Weapon element", "Elemento da arma", "Elemento del arma", "武器屬性"],
+    simTgtEl: ["Target element", "Elemento do alvo", "Elemento del objetivo", "目標屬性"],
+    simEst: ["Average for this run", "Média para esta run", "Promedio para esta partida", "此長度的平均"],
+    simAltars: ["god altars (Valkyrie, Freyja)", "altares de deus (Valkyrie, Freyja)", "altares de dioses (Valkyrie, Freyja)", "神壇（Valkyrie、Freyja）"],
+    simAltarsAll: ["god altars", "altares de deus", "altares de dioses", "神壇"],
+    simKarma: ["Hel altars", "altares de Hel", "altares de Hel", "Hel 神壇"], simKarmaL: ["Baldur altars", "altares de Baldur", "altares de Baldur", "Baldur 神壇"],
+    simMarks: ["Hel Marks", "Hel Marks", "Hel Marks", "Hel 印記"], simBoons: ["raids won", "raids vencidas", "incursiones ganadas", "勝利的襲擊"],
+    simNote: ["Averages from the game's own timers: an altar every 60–90 s (you pray at every Valkyrie and Freyja), a corrupt demon every 110–160 s (Hel Mark on Niflheim), a karma altar every 150–210 s, one path raid every 8 min. Real runs vary with luck and choices.",
+      "Médias tiradas dos tempos do próprio jogo: um altar a cada 60–90 s (rezando em todo Valkyrie e Freyja), um demônio corrompido a cada 110–160 s (Hel Mark no Niflheim), um altar de karma a cada 150–210 s, uma raid de caminho a cada 8 min. Runs reais variam com sorte e escolhas.",
+      "Promedios de los tiempos del propio juego: un altar cada 60–90 s (rezando en todo Valkyrie y Freyja), un demonio corrupto cada 110–160 s (Hel Mark en Niflheim), un altar de karma cada 150–210 s, una incursión de ruta cada 8 min. Las partidas reales varían con la suerte y las decisiones.",
+      "依遊戲本身的計時取平均：每 60–90 秒一座神壇（每座 Valkyrie 與 Freyja 都祈禱）、每 110–160 秒一個腐化惡魔（尼芙爾海姆的 Hel 印記）、每 150–210 秒一座業力神壇、每 8 分鐘一次路線襲擊。實際遊戲會因運氣與選擇而不同。"],
+    simMvpNote: ["MVP: it stands still and uses no mechanics; you hit until it dies. Its health follows the game (mvp_raid.gd): at least your measured DPS × 1.3 × 45 s × the boss's own multiplier, so it lasts about 58 s of your damage on a neutral target and grows as your damage grows. From 40 s on, Ymir's Heart raises your damage. The element table applies per hit type (basic attack = weapon element, Heal and Holy Light = Holy, Envenom = Poison).",
+      "MVP: fica parado e não usa mecânicas; você bate até ele morrer. A vida segue o jogo (mvp_raid.gd): no mínimo seu DPS medido × 1,3 × 45 s × o multiplicador do chefe, então dura uns 58 s do seu dano num alvo neutro e cresce junto com o seu dano. A partir dos 40 s o Coração de Ymir aumenta seu dano. A tabela de elementos vale por tipo de golpe (ataque básico = elemento da arma, Heal e Holy Light = Sagrado, Envenom = Veneno).",
+      "MVP: se queda quieto y no usa mecánicas; golpeas hasta que muere. Su vida sigue al juego (mvp_raid.gd): como mínimo tu DPS medido × 1,3 × 45 s × el multiplicador del jefe, así que dura unos 58 s de tu daño en un objetivo neutro y crece con tu daño. Desde los 40 s el Corazón de Ymir sube tu daño. La tabla de elementos se aplica por tipo de golpe (ataque básico = elemento del arma, Heal y Holy Light = Sagrado, Envenom = Veneno).",
+      "MVP：站著不動、不使用機制，你一直打到牠倒下。生命依照遊戲（mvp_raid.gd）：至少為你的實測 DPS × 1.3 × 45 秒 × 首領自身倍率，因此在中性目標上約撐你 58 秒的傷害，並隨你的傷害成長。40 秒後尤彌爾之心會提高你的傷害。屬性表依攻擊類型套用（普攻 = 武器屬性，治療與神聖之光 = 聖，Envenom = 毒）。"],
+    mtTest: ["Test", "Testar", "Probar", "測試"], mtCont: ["Continue", "Continuar", "Continuar", "繼續"],
+    mtRetest: ["Test again", "Testar de novo", "Probar de nuevo", "再測一次"],
+    mtHp: ["HP", "Vida", "Vida", "HP"],
+    mtDead: ["%s defeated in %t", "%s derrotado em %t", "%s derrotado en %t", "%s 於 %t 被擊敗"],
+    mtAlive: ["%s still alive after %t", "%s ainda vivo depois de %t", "%s sigue vivo tras %t", "%s 在 %t 後仍存活"],
+    mtYmir: ["Ymir: you x%s", "Ymir: você x%s", "Ymir: tú x%s", "尤彌爾：你 x%s"],
+    simTotalAll: ["Total damage", "Dano total", "Daño total", "總傷害"],
+    simBossHp: ["MVP health", "Vida do MVP", "Vida del MVP", "MVP 生命"], simKill: ["Time to kill", "Tempo para matar", "Tiempo para matar", "擊殺時間"],
+    simUnsup: ["Simulated: basic attacks, procs (Heal, Envenom, Holy Light), Lex Aeterna and every damage over time from the game code (poison ticks and corrosion, bleed bursts, burn with heat). Active skills, Mirror Image, combos and summons are coming next.",
+      "Simulado: ataques básicos, procs (Heal, Envenom, Holy Light), Lex Aeterna e todo dano ao longo do tempo do código do jogo (ticks e corrosão do veneno, estouros de sangramento, queimadura com calor). Skills ativas, Mirror Image, combos e invocações vêm em seguida.",
+      "Simulado: ataques básicos, procs (Heal, Envenom, Holy Light), Lex Aeterna y todo daño en el tiempo del código del juego (ticks y corrosión del veneno, estallidos de sangrado, quemadura con calor). Habilidades activas, Mirror Image, combos e invocaciones vienen después.",
+      "已模擬：普攻、觸發（Heal、Envenom、Holy Light）、Lex Aeterna，以及遊戲程式中的所有持續傷害（毒的跳傷與腐蝕、流血爆發、帶熱度的燃燒）。主動技能、Mirror Image、連擊與召喚之後推出。"],
+    mtTitle: ["DPS", "DPS", "DPS", "DPS"],
+    mtWait: ["No damage yet", "Sem dano ainda", "Sin daño todavía", "尚無傷害"],
+    mtPlay: ["Play", "Reproduzir", "Reproducir", "播放"], mtPause: ["Pause", "Pausar", "Pausar", "暫停"],
+    mtAgain: ["Restart", "Recomeçar", "Reiniciar", "重新開始"], mtEnd: ["Skip to end", "Pular pro fim", "Saltar al final", "跳到結尾"],
+    mtSpeed: ["Speed", "Velocidade", "Velocidad", "速度"],
+    mtEmp: ["Emperium", "Emperium", "Emperium", "Emperium"],
+    mtAuto: ["%s (auto)", "%s (auto)", "%s (auto)", "%s（自動）"],
+    mtAutoHit: ["%s (auto, when hit)", "%s (auto, ao ser atingido)", "%s (auto, al recibir)", "%s（自動，受擊時）"],
+    mtNote: ["Same meter as the game: each row is its damage divided by the time since the first hit, refreshed every 0.25 s.",
+      "Mesmo medidor do jogo: cada linha é o dano dela dividido pelo tempo desde o primeiro golpe, atualizado a cada 0,25 s.",
+      "El mismo medidor del juego: cada fila es su daño dividido por el tiempo desde el primer golpe, actualizado cada 0,25 s.",
+      "與遊戲相同的計量表：每一列為其傷害除以首次命中後的時間，每 0.25 秒更新。"],
+    simParts: ["Damage by type", "Dano por tipo", "Daño por tipo", "依類型的傷害"],
+    pt_basic: ["Basic attack", "Ataque básico", "Ataque básico", "普攻"],
+    pt_heal_hit: ["Heal (when hit)", "Heal (ao ser tocado)", "Heal (al ser golpeado)", "Heal（被擊中時）"],
+    pt_poison: ["Poison", "Veneno", "Veneno", "毒"], pt_bleed: ["Bleed", "Sangramento", "Sangrado", "流血"], pt_burn: ["Burn", "Queimadura", "Quemadura", "燃燒"],
     sheetBtn: ["Calculate with the damage engine", "Calcular com o motor de dano", "Calcular con el motor de daño", "用傷害引擎計算"],
     sheetLoad: ["Loading the engine (first time ~10 MB)…", "Carregando o motor (primeira vez ~10 MB)…", "Cargando el motor (primera vez ~10 MB)…", "載入引擎中（首次約 10 MB）…"],
     sheetErr: ["The engine failed: ", "O motor falhou: ", "El motor falló: ", "引擎錯誤："],
@@ -247,7 +303,7 @@
   /* ---------------- per-item rules ---------------- */
   function slotless(it) { return it.s === "soul" || (it.s === "low" && it.face); }
   function noRoll(it) { return it.r === "l" || it.r === "u" || !!it.wings; }   // legendaries, uniques and Tower wings drop with 0 slots (Equipment.make(id, 0))
-  function natSlots(g) { var it = D.items[g.id]; return it.fs !== undefined ? it.fs : (slotless(it) || noRoll(it) ? 0 : (g.slots || 0)); }
+  function natSlots(g) { var it = D.items[g.id]; return it.fs !== undefined ? it.fs : (slotless(it) || noRoll(it) ? 0 : D.rules.naturalSlots); }   // Epic: always 3 (user rule)
   function sockets(g) {
     var it = D.items[g.id];
     if (slotless(it)) return 0;
@@ -472,7 +528,8 @@
       prio: (o.prio || []).filter(function (x, i, a) { return x && upInfo(x.id) && a.map(function (y) { return y && y.id; }).indexOf(x.id) === i; }).map(function (x) { return { id: x.id, lim: Math.max(0, Math.min(999, +x.lim || 0)), ban: !!x.ban }; }),
       banish: (o.banish || []).filter(function (x, i, a) { return upInfo(x) && a.indexOf(x) === i; }).slice(0, D.rules.holyMax),
       favs: (o.favs || []).filter(function (x, i, a) { return upInfo(x) && a.indexOf(x) === i; }).slice(0, D.rules.favMax),
-      holy: Math.max(0, Math.min(D.rules.holyMax, o.holy === undefined ? D.rules.holyMax : +o.holy)), fill: o.fill === undefined ? true : !!o.fill });
+      holy: Math.max(0, Math.min(D.rules.holyMax, o.holy === undefined ? D.rules.holyMax : +o.holy)), fill: o.fill === undefined ? true : !!o.fill,
+      sim: (o.sim && typeof o.sim === "object") ? { target: String(o.sim.target || "emperium"), path: o.sim.path === "light" ? "light" : "dark", minutes: Math.max(1, Math.min(120, +o.sim.minutes || 40)), acct: !!o.sim.acct } : {} });
   }
 
   /* ---------------- rendering ---------------- */
@@ -509,6 +566,7 @@
       var it = D.items[g.id], bits = [];
       if (refinable(it) && g.refine) bits.push("+" + g.refine);
       if (gradable(it) && g.grade && (g.refine || 0) >= D.rules.gradeMinRefine) bits.push(D.weaponGrades[g.grade]);
+      if (g.endow && D.elements && D.elements[g.endow]) bits.push(L(D.elements[g.endow]));
       if (g.trait && canTrait(g)) bits.push(L(D.traits[g.trait].n));
       var cardsHtml = (g.cards || []).map(function (c) { return D.cards[c] ? ico(D.cards[c].ic, "pl-mini") : ""; }).join("");
       var n = sockets(g), free = Math.max(0, n - (g.cards || []).length);
@@ -581,7 +639,7 @@
     extra += "<tr><td>" + t("statCap") + '</td><td class="n">' + (D.rules.maxStat + (tot.raw.wing_stat_cap || 0)) + "</td></tr>";
     if (tot.harmony) extra += "<tr><td>" + t("harmony") + '</td><td class="n">' + D.weaponGrades[tot.harmony] + "</td></tr>";
     var specials = tot.specials.map(function (x) { return "<li>" + ico(x.ic, "pl-mini") + "<span><b>" + esc(x.n) + "</b> " + esc(x.d) + "</span></li>"; }).join("");
-    return '<section class="pl-box"><h2>' + t("totals") + "</h2>" +
+    return '<section class="pl-box" data-box="totals"><h2>' + t("totals") + "</h2>" +
       (rows || extra ? '<div class="tw"><table><tbody>' + rows + extra + "</tbody></table></div>" : '<p class="muted">' + t("empty") + "</p>") +
       (jbx ? '<p class="pl-note">' + t("classBonus") + ": +" + Math.round(jbx.dmg * 100) + "% " + esc(labelOf("dmg")) + ", +" + Math.round(jbx.hp * 100) + "% " + esc(labelOf("max_hp_pct")) + (jbx.more !== 1 ? ", ×" + jbx.more : "") + "</p>" : "") +
       (S.gear.soul && !soulOpen() ? '<p class="pl-note bad-note">' + t("soulOff") + "</p>" : "") +
@@ -601,7 +659,7 @@
       .map(function (k) { var x = D.plag[k]; return chip("plag", k, x.ic, x.n, t("from") + " " + x.boss); }).join("");
     if ((S.plag || []).length < pc) plags += addBtn("plag");
     var lv = ""; for (var i = 0; i <= D.rules.albumUpgrades; i++) lv += '<option value="' + i + '"' + (i === (S.albumLv || 0) ? " selected" : "") + ">" + i + " (" + (D.rules.albumBase + i) + ")</option>";
-    return '<section class="pl-box"><h2>' + t("ap") + "</h2>" +
+    return '<section class="pl-box" data-box="ap"><h2>' + t("ap") + "</h2>" +
       "<h3>" + t("album") + ' <b class="pl-cap">' + Math.min((S.album || []).length, cap) + "/" + cap + "</b></h3>" +
       '<label class="pl-chef">' + t("albumLv") + ' <select data-act="albumlv">' + lv + '</select></label><div class="pl-chips">' + cards + '</div><p class="pl-note muted">' + t("albumNote") + "</p>" +
       "<h3>" + t("plag") + ' <b class="pl-cap">' + Math.min((S.plag || []).length, pc) + "/" + pc + '</b></h3><div class="pl-chips">' + plags + '</div><p class="pl-note muted">' + (cls().rogue ? t("plagRogue") : t("plagAny")) + "</p></section>";
@@ -621,7 +679,7 @@
     var hv = ""; for (var i = 0; i <= D.rules.holyMax; i++) hv += '<option value="' + i + '"' + (i === (S.holy || 0) ? " selected" : "") + ">" + i + "</option>";
     var favs = (S.favs || []).map(function (k) { var x = upInfo(k); return chip("fav", k, x.ic, x.n, ""); }).join("");
     if ((S.favs || []).length < D.rules.favMax) favs += addBtn("fav");
-    return '<section class="pl-box"><h2>' + t("sk") + '</h2><div class="two prio pl-sk"><div>' +
+    return '<section class="pl-box" data-box="sk"><h2>' + t("sk") + '</h2><div class="two prio pl-sk"><div>' +
       "<h3>" + t("prio") + '</h3><label class="pl-chk"><input type="checkbox" data-act="fill"' + (S.fill ? " checked" : "") + "> " + t("fill") + "</label>" +
       '<div class="tw"><table class="pl-prio"><thead><tr><th>#</th><th>' + t("upgrade") + "</th><th>" + t("limit") + "</th><th>" + t("banLimit") + "</th><th></th></tr></thead><tbody>" + rows + "</tbody></table></div>" + left +
       '<p class="pl-note muted">' + t("prioNote") + "</p></div><div>" +
@@ -636,7 +694,7 @@
     var dishes = (S.dishes || []).slice(0, chef).map(function (k) { return chip("dish", k, D.dishes[k].ic, D.dishes[k].n, ""); }).join("");
     if ((S.dishes || []).length < chef) dishes += addBtn("dish");
     var pet = S.pet ? chip("pet", S.pet, D.pets[S.pet].ic, D.pets[S.pet].n, D.pets[S.pet].mvp ? t("mvpPet") : "") : addBtn("pet");
-    return '<section class="pl-box"><h2>' + t("ppd") + "</h2>" +
+    return '<section class="pl-box" data-box="ppd"><h2>' + t("ppd") + "</h2>" +
       "<h3>" + t("pacts") + ' <b class="pl-cap">' + (S.pacts || []).length + "/" + mp + '</b></h3><div class="pl-chips">' + pacts + '</div><p class="pl-note muted">' + t("pactNote") + "</p>" +
       "<h3>" + t("dishes") + ' <b class="pl-cap">' + Math.min((S.dishes || []).length, chef) + "/" + chef + '</b></h3>' +
       '<label class="pl-chef">' + t("chef") + ' <select data-act="chef">' + opts(1, D.rules.chefMax, chef) + '</select></label><div class="pl-chips">' + dishes + '</div><p class="pl-note muted">' + t("chefNote") + "</p>" +
@@ -652,7 +710,7 @@
     var skRows = sk.map(function (id) { var x = upInfo(id); return '<label class="pl-sklv">' + upIcon(id) + "<span>" + esc(x.n) + "</span>" + numIn("skl." + id, (S.skl || {})[id]) + "</label>"; }).join("");
     var a = S.acct || {};
     var gods = GODS.map(function (gd) { return "<label><small>" + gd.charAt(0).toUpperCase() + gd.slice(1) + "</small>" + numIn("god." + gd, (a.gods || {})[gd]) + "</label>"; }).join("");
-    return '<section class="pl-box"><h2>' + t("chr") + "</h2>" +
+    return '<section class="pl-box" data-box="chr"><h2>' + t("chr") + "</h2>" +
       '<label class="pl-chef">' + t("lv") + " " + numIn("lv", S.lv, 90) + "</label>" +
       "<h3>" + t("baseSt") + "</h3>" + stRow("base") + "<h3>" + t("runSt") + "</h3>" + stRow("run") +
       "<h3>" + t("sklLv") + '</h3><div class="pl-sklvs">' + skRows + '</div><p class="pl-note muted">' + t("sklNote") + "</p>" +
@@ -687,14 +745,159 @@
       if (slot === "soul" && !soulOpen()) return;
       gear[slot] = { id: g.id, slots: natSlots(g), refine: refinable(it) ? (g.refine || 0) : 0, grade: gradable(it) ? (g.grade || 0) : 0,
         cards: (g.cards || []).filter(function (x) { return x; }).slice(0, sockets(g)), trait: g.trait && canTrait(g) ? g.trait : null, pot: (g.pot || []).filter(function (l) { return l && l.k; }) };
+      if (g.endow && it.s === "weapon") gear[slot].endow = g.endow;
     });
     o.gear = gear; o.album = (S.album || []).slice(0, albumCap());
     return o;
   }
-  function sheetBox() { return '<section class="pl-box pl-sheet"><h2>' + t("sheet") + '</h2><div id="pl-sheet-body"></div><p class="pl-note muted">' + t("sheetNote") + "</p></section>"; }
+  function sheetBox() { return '<section class="pl-box pl-sim" data-box="sim"><h2>' + t("sim") + '</h2><div id="pl-sim-body"></div></section>'; }
   function f2(v, d) { return (Math.round(v * Math.pow(10, d)) / Math.pow(10, d)).toLocaleString(); }
   function big(v) { return v >= 1e6 ? v.toExponential(2).replace("e+", "e") : f2(v, v < 10 ? 3 : v < 100 ? 2 : 0); }
-  function drawSheet() {
+  var SIMRES = null, SIMBUSY = false;
+  function simOpts() { var o = S.sim || {}; return { target: o.target || "emperium", path: o.path === "light" ? "light" : "dark", minutes: Math.max(1, Math.min(40, +o.minutes || 40)), estimate: o.acct ? false : true }; }
+  function runSim() {
+    if (!PY) return;
+    try { SIMRES = JSON.parse(PY.globals.get("web").simulate(JSON.stringify(engineState()), JSON.stringify(simOpts()))); } catch (e) { SIMRES = { ok: false, error: String(e) }; }
+  }
+  function elName(e) { return D.elements && D.elements[e] ? L(D.elements[e]) : (e || ""); }
+  // ---- live DPS meter: plays back the engine timeline like the game's damage_meter.gd (DPS mode)
+  var MT = { raf: 0, tau: 0, last: 0, speed: 1, play: false, shown: -1 };
+  var MT_EL = { neutral: "#9eadcc", water: "#73adfa", earth: "#b89461", fire: "#fa8c52", wind: "#a8d966", poison: "#9ec759",
+    holy: "#fae073", shadow: "#9e7ad1", ghost: "#c7b8f2", undead: "#8c8c99" };
+  var MT_UNITS = [[1e33, "Dc"], [1e30, "No"], [1e27, "Oc"], [1e24, "Sp"], [1e21, "Sx"], [1e18, "Qi"], [1e15, "Q"], [1e12, "T"], [1e9, "B"], [1e6, "M"]];
+  function mtShort(v) {                                   // damage_meter.gd::short
+    if (v >= 9.9995e35) { var e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e); if (m >= 9.95) { m /= 10; e += 1; } return m.toFixed(1) + "e" + e; }
+    for (var i = 0; i < MT_UNITS.length; i++) if (v >= MT_UNITS[i][0] * 0.99995) return (v / MT_UNITS[i][0]).toFixed(1) + MT_UNITS[i][1];
+    if (v >= 10000) return Math.round(v / 1000) + "k";
+    if (v >= 1000) return (v / 1000).toFixed(1) + "k";
+    return String(Math.round(v));
+  }
+  function mtName(k) {
+    var sk = { heal: "Heal", heal_hit: "Heal", envenom: "Envenom", holy_light: "Holy Light" };
+    if (k === "heal_hit") return t("mtAutoHit").replace("%s", sk[k]);
+    if (sk[k]) return t("mtAuto").replace("%s", sk[k]);
+    if (k === "lex") return "Lex Aeterna";
+    return t("pt_" + k);
+  }
+  function mtIcon(k) {
+    if (k === "basic") { var w = S.gear && S.gear.weapon, it = w && D.items[w.id]; return ico(it && it.ic, "pl-mt-ic"); }
+    return ico(D.meterIcons && D.meterIcons[k], "pl-mt-ic");
+  }
+  function mtClock(x) { x = Math.max(0, Math.floor(x)); return Math.floor(x / 60) + ":" + ("0" + (x % 60)).slice(-2); }
+  function mtStop() { if (MT.raf) cancelAnimationFrame(MT.raf); MT.raf = 0; }
+  function mtFrame() {
+    var tl = SIMRES && SIMRES.timeline, box = document.getElementById("pl-mt"); if (!tl || !box) return;
+    var T = tl.frames[tl.frames.length - 1][0], lo = 0, hi = tl.frames.length - 1;
+    while (lo < hi) { var mid = (lo + hi + 1) >> 1; if (tl.frames[mid][0] <= MT.tau + 1e-9) lo = mid; else hi = mid - 1; }
+    var i = lo;
+    if (i === MT.shown) return; MT.shown = i;
+    var f = tl.frames[i], now = f[0], mt = Math.max(1, now), rows = [], tot = 0;      // main.gd::meter_time = max(1, elapsed)
+    tl.keys.forEach(function (k, j) { var v = f[2 + j]; if (v > 0) { rows.push([k, v]); tot += v; } });
+    rows.sort(function (a, b) { return b[1] - a[1]; });
+    var top = rows.length ? rows[0][1] : 1, els = SIMRES.row_el || {};
+    box.querySelector(".pl-mt-dps").textContent = t("mtTitle") + " · " + mtShort(tot / mt) + "/s";
+    box.querySelector(".pl-mt-clock").textContent = mtClock(now) + " / " + mtClock(T) + (SIMRES.emperiums !== undefined ? " · " + t("mtEmp") + " " + (f[1] + 1) : "");
+    box.querySelector(".pl-mt-rows").innerHTML = rows.length ? rows.slice(0, 6).map(function (r, n) {
+      var c = MT_EL[els[r[0]]] || MT_EL.neutral;
+      return '<div class="pl-mt-row"><i style="width:' + (100 * r[1] / top).toFixed(2) + "%;background:" + c + '"></i>' + mtIcon(r[0]) +
+        '<span class="pl-mt-n">' + (n + 1) + ". " + esc(mtName(r[0])) + '</span><b>' + mtShort(r[1] / mt) + "/s</b></div>";
+    }).join("") : '<p class="pl-mt-empty">' + t("mtWait") + "</p>";
+    box.querySelector(".pl-mt-bar i").style.width = (100 * now / T).toFixed(2) + "%";
+    if (SIMRES.boss_hp) {
+      var left = Math.max(0, SIMRES.boss_hp - tot), hb = box.querySelector(".pl-mt-hp");
+      hb.querySelector("i").style.width = (100 * left / SIMRES.boss_hp).toFixed(2) + "%";
+      hb.querySelector("span").textContent = t("mtHp") + " " + mtShort(left) + " / " + mtShort(SIMRES.boss_hp);
+      var ym = mtYmir(now), msg = box.querySelector(".pl-mt-msg"), done = MT.tau >= T - 1e-9;
+      box.querySelector(".pl-mt-clock").textContent = mtClock(now) + (ym > 1.001 ? " · " + t("mtYmir").replace("%s", ym.toFixed(1)) : "");
+      msg.textContent = done ? (SIMRES.killed != null ? t("mtDead") : t("mtAlive")).replace("%s", mtBoss()).replace("%t", mtClock(SIMRES.killed != null ? SIMRES.killed : T)) : "";
+      msg.className = "pl-mt-msg" + (done ? (SIMRES.killed != null ? " ok" : " bad") : "");
+      var res = document.getElementById("pl-sim-res"); if (res) res.hidden = !done;
+    }
+  }
+  function mtBoss() { var m = (D.mvps || []).filter(function (x) { return x.id === simOpts().target; })[0]; return m ? m.n : "MVP"; }
+  function mtYmir(x) {                                          // mvp_raid.gd::_tick_ymir (RAID_YMIR_* 0.2.8)
+    if (x <= 40) return 1; x -= 40;
+    var y = x <= 60 ? x + x * x / 120 : 90 + 2 * (x - 60);
+    return 1 + 0.08 * y;
+  }
+  function mtTick(ts) {
+    var tl = SIMRES && SIMRES.timeline; if (!tl) return mtStop();
+    var T = tl.frames[tl.frames.length - 1][0];
+    if (MT.last) MT.tau = Math.min(T, MT.tau + (ts - MT.last) / 1000 * MT.speed);
+    MT.last = ts; mtFrame();
+    if (MT.tau >= T) { MT.play = false; mtButtons(); MT.raf = 0; return; }
+    MT.raf = requestAnimationFrame(mtTick);
+  }
+  function mtStart() { mtStop(); MT.play = true; MT.last = 0; mtButtons(); MT.raf = requestAnimationFrame(mtTick); }
+  function mtButtons() {
+    var b = document.querySelector('#pl-mt [data-mt="play"]'); if (!b) return;
+    var tl = SIMRES && SIMRES.timeline, T = tl ? tl.frames[tl.frames.length - 1][0] : 0, mvp = !!(SIMRES && SIMRES.boss_hp);
+    b.textContent = MT.play ? t("mtPause") : !mvp ? t("mtPlay") : MT.tau <= 0 ? t("mtTest") : MT.tau >= T - 1e-9 ? t("mtRetest") : t("mtCont");
+    b.classList.toggle("pl-primary", mvp && !MT.play);
+  }
+  function mtWire() {
+    var box = document.getElementById("pl-mt"); if (!box) return;
+    box.querySelectorAll("[data-mt]").forEach(function (b) {
+      b.onclick = function () {
+        var a = b.getAttribute("data-mt"), tl = SIMRES.timeline, T = tl.frames[tl.frames.length - 1][0];
+        if (a === "play") { if (MT.play) { MT.play = false; mtStop(); mtButtons(); } else { if (MT.tau >= T) { MT.tau = 0; MT.shown = -1; } mtStart(); } }
+        else if (a === "again") { MT.tau = 0; MT.shown = -1; mtStart(); }
+        else if (a === "end") { mtStop(); MT.play = false; MT.tau = T; MT.shown = -1; mtFrame(); mtButtons(); }
+        else { MT.speed = +a; box.querySelectorAll("[data-mt]").forEach(function (x) { if (/^\d+$/.test(x.getAttribute("data-mt"))) x.classList.toggle("on", +x.getAttribute("data-mt") === MT.speed); }); }
+      };
+    });
+  }
+  function mtBox() {
+    var sp = [1, 5, 20].map(function (v) { return '<button type="button" class="btn pl-mt-sp' + (MT.speed === v ? " on" : "") + '" data-mt="' + v + '">' + v + "×</button>"; }).join("");
+    var hp = SIMRES && SIMRES.boss_hp ? '<div class="pl-mt-hp"><i></i><span></span></div>' : "";
+    return '<div class="pl-mt" id="pl-mt"><div class="pl-mt-head"><b class="pl-mt-dps"></b><span class="pl-mt-clock"></span></div>' + hp + '<p class="pl-mt-msg"></p>' +
+      '<div class="pl-mt-rows"></div><div class="pl-mt-bar"><i></i></div>' +
+      '<div class="pl-mt-ctl"><button type="button" class="btn" data-mt="play"></button><button type="button" class="btn" data-mt="again">' + t("mtAgain") +
+      '</button><button type="button" class="btn" data-mt="end">' + t("mtEnd") + '</button><span class="pl-mt-spl">' + t("mtSpeed") + "</span>" + sp + "</div></div>";
+  }
+  function drawSim() {
+    mtStop();
+    var el = document.getElementById("pl-sim-body"); if (!el) return;
+    var o = simOpts(), tg = '<option value="emperium"' + (o.target === "emperium" ? " selected" : "") + ">Emperium Festival</option>" +
+      (D.mvps || []).map(function (m) { return '<option value="' + m.id + '"' + (o.target === m.id ? " selected" : "") + ">" + esc(m.n) + " · " + esc(elName(m.el)) + "</option>"; }).join("");
+    var form = '<div class="pl-simf"><label>' + t("simTarget") + '<select data-sim="target">' + tg + "</select></label>" +
+      '<label>' + t("simPath") + '<select data-sim="path"' + (S.sim && S.sim.acct ? " disabled" : "") + '><option value="dark"' + (o.path === "dark" ? " selected" : "") + ">" + t("simDark") + '</option><option value="light"' + (o.path === "light" ? " selected" : "") + ">" + t("simLight") + "</option></select></label>" +
+      '<label>' + t("simMin") + '<input type="number" min="1" max="40" step="5" data-sim="minutes" value="' + o.minutes + '"' + (S.sim && S.sim.acct ? " disabled" : "") + "></label>" +
+      '<label class="pl-chk"><input type="checkbox" data-sim="acct"' + (S.sim && S.sim.acct ? " checked" : "") + "> " + t("simAcct") + "</label></div>";
+    var body = "";
+    if (PYERR) body += '<p class="pl-note bad-note">' + t("sheetErr") + esc(PYERR) + "</p>";
+    if (!PY) body += PYLOAD ? '<p class="muted">' + t("sheetLoad") + "</p>" : '<button class="btn pl-wide pl-primary" type="button" data-act="sim">' + t("simGo") + "</button>";
+    else if (SIMRES && !SIMRES.ok) body += '<p class="pl-note bad-note">' + t("sheetErr") + esc(SIMRES.error) + "</p>";
+    else if (SIMRES) {
+      var r = SIMRES, row = function (k, v) { return "<tr><td>" + k + '</td><td class="n">' + v + "</td></tr>"; };
+      if (r.timeline) body += mtBox() + '<p class="pl-note muted">' + t("mtNote") + "</p>";
+      body += '<div class="tw" id="pl-sim-res"' + (r.boss_hp ? " hidden" : "") + '><table><tbody>' +
+        (r.emperiums !== undefined ? row(t("simEmp"), "<b>" + f2(r.emperiums, 2) + "</b>") : "") +
+        (r.boss_hp ? row(t("simKill"), "<b>" + (r.killed != null ? mtClock(r.killed) : "&gt; " + mtClock(r.cap)) + "</b>") + row(t("simBossHp"), mtShort(r.boss_hp)) : "") +
+        row(t("simDps"), "<b>" + big(r.dps) + "</b>") + row(t(r.boss_hp ? "simTotalAll" : "simTotal"), big(r.total)) +
+        row(t("simWeapon"), esc(elName(r.weapon_el))) + (r.el ? row(t("simTgtEl"), esc(elName(r.el))) : "") + "</tbody></table></div>";
+      var a = r.acct || {}, ga = (a.gods || []).length, ka = (a.karma_altars || []).length;
+      body += '<p class="pl-row"><b>' + (r.estimate ? t("simEst") + " (" + o.minutes + " min)" : t("simAcct")) + ":</b> ~" + ga + " " + t(r.estimate ? "simAltars" : "simAltarsAll") + " · ~" + ka + " " + t(a.path === "light" ? "simKarmaL" : "simKarma") +
+        (a.path === "light" ? "" : " · ~" + a.marks + " " + t("simMarks")) + " · ~" + a.boons + " " + t("simBoons") + "</p>";
+      body += '<p class="pl-note muted">' + (r.estimate ? t("simNote") + " " : "") + (r.el ? t("simMvpNote") + " " : "") + t("simUnsup") + ' <span class="muted">engine ' + esc(r.version || CALCV) + "</span></p>";
+    }
+    el.innerHTML = form + body;
+    el.querySelectorAll("[data-sim]").forEach(function (inp) {
+      inp.onchange = function () {
+        S.sim = S.sim || {}; var k = inp.getAttribute("data-sim");
+        S.sim[k] = inp.type === "checkbox" ? inp.checked : (k === "minutes" ? Math.max(1, Math.min(40, +inp.value || 40)) : inp.value);
+        persist(); if (PY) runSim(); drawSim();
+      };
+    });
+    var b = el.querySelector('[data-act="sim"]'); if (b) b.onclick = function () { PYERR = null; loadEngine().then(function () { runSim(); drawSim(); }); drawSim(); };
+    if (SIMRES && SIMRES.timeline && document.getElementById("pl-mt")) {
+      mtWire(); MT.shown = -1;
+      if (SIMRES !== MT.res) { MT.res = SIMRES; MT.tau = 0; MT.play = false; if (SIMRES.boss_hp) { mtFrame(); mtButtons(); } else mtStart(); }
+      else { mtFrame(); if (MT.play) mtStart(); else mtButtons(); }
+    }
+  }
+  function drawSheet() { if (PY) runSim(); drawSim(); return; }
+  function drawSheetOld() {
     var el = document.getElementById("pl-sheet-body"); if (!el) return;
     if (!PY) {
       el.innerHTML = (PYERR ? '<p class="pl-note bad-note">' + t("sheetErr") + esc(PYERR) + "</p>" : "") +
@@ -739,10 +942,31 @@
       return '<li><img src="' + BASE + "../assets/icons/job_" + b.data.cls + '.png" alt=""><span><b>' + esc(b.name || t("untitled")) + "</b><small>" + esc(c ? (D.classNames[c.id] || c.name) : "") + "</small></span>" +
         '<button class="btn" type="button" data-load="' + i + '">' + t("load") + '</button><button class="btn" type="button" data-dup="' + i + '" title="' + t("dup") + '">' + t("dupShort") + '</button><button class="btn" type="button" data-del="' + i + '" aria-label="' + t("del") + '">×</button></li>';
     }).join("") : '<li class="muted">' + t("noSaved") + "</li>";
-    return '<section class="pl-box"><h2>' + t("saved") + '</h2><ul class="pl-saved">' + list + "</ul></section>";
+    return '<section class="pl-box" data-box="saved"><h2>' + t("saved") + '</h2><ul class="pl-saved">' + list + "</ul></section>";
   }
 
+  /* collapsible boxes: click a box title to fold it; remembered per box in this browser */
+  var LS_FOLD = "msg-planner-folded";
+  function folded() { try { return JSON.parse(localStorage.getItem(LS_FOLD) || "[]"); } catch (e) { return []; } }
+  function wireFold() {
+    var f = folded();
+    root.querySelectorAll("section[data-box]").forEach(function (sec) {
+      var h = sec.querySelector(":scope > h2"), key = sec.getAttribute("data-box");
+      if (!h) return;
+      h.classList.add("toggle"); h.setAttribute("role", "button"); h.setAttribute("tabindex", "0");
+      var set = function (on) { sec.classList.toggle("collapsed", on); h.setAttribute("aria-expanded", on ? "false" : "true"); };
+      set(f.indexOf(key) >= 0);
+      var flip = function () {
+        var cur = folded().filter(function (x) { return x !== key; }), on = !sec.classList.contains("collapsed");
+        if (on) cur.push(key); set(on);
+        try { localStorage.setItem(LS_FOLD, JSON.stringify(cur)); } catch (e) {}
+      };
+      h.onclick = flip;
+      h.onkeydown = function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); flip(); } };
+    });
+  }
   function wire() {
+    wireFold();
     root.querySelectorAll(".pl-slot").forEach(function (b) { b.onclick = function () { openEditor(b.getAttribute("data-slot")); }; });
     var q = function (sel) { return root.querySelector(sel); };
     root.querySelectorAll("[data-tab]").forEach(function (b) { b.onclick = function () { TAB = b.getAttribute("data-tab"); editSlot = null; render(); }; });
@@ -948,7 +1172,7 @@
       b.onclick = function () {
         if (b.classList.contains("blocked")) return;
         var id = b.getAttribute("data-id"), it = D.items[id];
-        S.gear[slot] = { id: id, refine: refinable(it) ? D.rules.maxRefine : 0, slots: it.fs !== undefined ? it.fs : (slotless(it) || noRoll(it) ? 0 : D.rules.naturalSlots), extra: noRoll(it) && !slotless(it) ? extraCap(it) : 0, cards: [], pot: [] };
+        S.gear[slot] = { id: id, refine: refinable(it) ? D.rules.maxRefine : 0, slots: it.fs !== undefined ? it.fs : (slotless(it) || noRoll(it) ? 0 : D.rules.naturalSlots), extra: !slotless(it) ? extraCap(it) : 0, cards: [], pot: [] };
         if (slot === "weapon" && it.th && S.gear.shield) delete S.gear.shield;
         persist(); render();
       };
@@ -966,7 +1190,11 @@
     if (slot === "shield" && it.s === "weapon") h += '<p class="pl-note muted">' + t("leftHalf") + "</p>";
     var grid = "";
     if (refinable(it)) grid += '<label>' + t("refine") + '<select data-f="refine">' + opts(0, D.rules.maxRefine, g.refine || 0, function (i) { return "+" + i; }) + "</select></label>";
-    if (!slotless(it) && it.fs === undefined && !noRoll(it)) grid += '<label>' + t("slotsNat") + '<select data-f="slots">' + opts(0, D.rules.naturalSlots, g.slots || 0) + "</select></label>";
+    if (it.s === "weapon" && D.endow) {   // Narakusa endow: equipment.gd weapon_element (the item's "endow" overrides its element)
+      var elOpts = '<option value="">' + esc(t("elOrig") + " (" + L(D.elements[it.el || "neutral"])) + ")</option>" +
+        ["neutral"].concat(D.endow).filter(function (e) { return e !== (it.el || "neutral"); }).map(function (e) { return '<option value="' + e + '"' + (g.endow === e ? " selected" : "") + ">" + esc(L(D.elements[e])) + "</option>"; }).join("");
+      grid += '<label>' + t("element") + '<select data-f="endow">' + elOpts + "</select></label>";
+    }
     if (extraCap(it)) grid += '<label>' + t("slotsExtra") + '<select data-f="extra">' + opts(0, extraCap(it), g.extra || 0, function (i) { return "+" + i; }) + "</select></label>";
     if (gradable(it)) {
       var gnames = it.s === "weapon" ? D.weaponGrades : ["—", "D", "C", "B", "A", "S"];
@@ -1018,7 +1246,8 @@
     modal.querySelectorAll("[data-f]").forEach(function (sel) {
       sel.onchange = function () {
         var f = sel.getAttribute("data-f");
-        g[f] = f === "trait" ? sel.value : +sel.value;
+        g[f] = (f === "trait" || f === "endow") ? sel.value : +sel.value;
+        if (f === "endow" && !g.endow) delete g.endow;
         if (f === "refine" && g.refine < D.rules.gradeMinRefine) g.grade = 0;
         if (!canTrait(g)) delete g.trait;
         redraw();
@@ -1104,6 +1333,7 @@
       var cards = (g.cards || []).filter(function (x) { return D.cards[x]; }), cardsW = cards.length * 19;
       c.font = "bold 14px " + FB; c.fillStyle = IC.ink; c.fillText(fit(c, it.n, cw - 66 - cardsW), cx + 58, cy + 35);
       var bits = []; if (refinable(it) && g.refine) bits.push("+" + g.refine); if (gradable(it) && g.grade && (g.refine || 0) >= D.rules.gradeMinRefine) bits.push(D.weaponGrades[g.grade]);
+      if (g.endow && D.elements && D.elements[g.endow]) bits.push(L(D.elements[g.endow]));
       if (g.trait && canTrait(g)) bits.push(L(D.traits[g.trait].n)); var pl = (g.pot || []).filter(function (l) { return l && l.k; }).length; if (pl) bits.push("SP " + pl + "/3");
       c.font = "12px " + FB; c.fillStyle = IC.muted; c.fillText(fit(c, bits.join(" · "), cw - 66 - cardsW), cx + 58, cy + 50);
       cards.forEach(function (cid, k) { var x = cx + cw - 8 - (cards.length - k) * 19; rr(c, x, cy + 14, 17, 24, 3, "#111", IC.border); drawIcon(c, IM[D.cards[cid].ic], x + 1, cy + 15, 22, true); });

@@ -96,7 +96,6 @@
     };
     var set = function (lv, cls, write) {
       home.lv = lv; home.cls = cls; render();
-      try { localStorage.setItem("homeLevel", lv); } catch (e) {}
       if (write && history.replaceState) history.replaceState(null, "", "#" + lv + (cls ? "/" + cls : ""));
     };
     /* after a filter change, bring the top of the list back into view if the user had scrolled past it */
@@ -106,9 +105,9 @@
       if (y < 0) window.scrollBy({ top: y, behavior: "smooth" });
     };
     var fromHash = function () {
-      var parts = (location.hash || "").replace("#", "").split("/"), saved = null;
-      try { saved = localStorage.getItem("homeLevel"); } catch (e) {}
-      set(okLv(parts[0]) ? parts[0] : okLv(saved) ? saved : "beginner", okCls(parts[1]) ? parts[1] : "", false);
+      /* plain Home (no hash) always opens on Beginner with no class filter; the last tab is not remembered (user, 2026-11-24) */
+      var parts = (location.hash || "").replace("#", "").split("/");
+      set(okLv(parts[0]) ? parts[0] : "beginner", okCls(parts[1]) ? parts[1] : "", false);
     };
     lvtabs.forEach(function (t) { t.addEventListener("click", function () { set(t.getAttribute("data-lv"), home.cls, true); }); });
     chips.forEach(function (c) {

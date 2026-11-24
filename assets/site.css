@@ -746,11 +746,11 @@ html:not(.dark) .sub-btn.lv-beginner b { color: #23733a; } html:not(.dark) .sub-
   background: linear-gradient(45deg, #d99a3a 0%, #c2652a 18%, #a8392f 34%, #8c1f35 48%, #a8487f 62%, #6e2a8a 78%, #46309a 100%); }
 .lvtab[aria-selected="false"] { filter: saturate(.6) brightness(.78); }
 .lvtab[aria-selected="false"]:hover { filter: saturate(.85) brightness(.92); }
-.lvtab[aria-selected="true"] { filter: none; box-shadow: inset 0 0 0 2px var(--border), 0 0 0 2px currentColor, 3px 3px 0 var(--border); }
+.lvtab[aria-selected="true"] { filter: none; box-shadow: inset 0 0 0 2px var(--border), 3px 3px 0 var(--border); outline: 2px solid var(--gold); outline-offset: 1px; }
 .lvtab.lv-beginner[aria-selected="true"] { background: var(--lv-beg); color: var(--lv-beg-ink); }
 .lvtab.lv-intermediate[aria-selected="true"] { background: var(--lv-int); color: var(--lv-int-ink); }
 .lvtab.lv-advanced[aria-selected="true"] { background: var(--lv-adv); color: var(--lv-adv-ink); }
-.lvtab.lv-public[aria-selected="true"] { color: #fff7ec; box-shadow: inset 0 0 0 2px var(--border), 0 0 0 2px #fff7ec, 3px 3px 0 var(--border);
+.lvtab.lv-public[aria-selected="true"] { color: #fff7ec; box-shadow: inset 0 0 0 2px var(--border), 3px 3px 0 var(--border);
   background: linear-gradient(45deg, #d99a3a 0%, #c2652a 18%, #a8392f 34%, #8c1f35 48%, #a8487f 62%, #6e2a8a 78%, #46309a 100%); }
 
 /* home class filter: chosen chip stands out, the rest step back; status line with "Clear filter" */
@@ -812,7 +812,7 @@ body.pl-on .site-footer { background: rgba(10,8,8,.7); color: #d8d3c8; }
 .gp { background: rgba(20,18,16,.74); border: 1px solid rgba(255,255,255,.28); border-radius: var(--radius); padding: 12px; backdrop-filter: blur(3px); margin-bottom: 14px; }
 .pl-stage .pl-box { background: none; border: 0; box-shadow: none; padding: 0; margin: 0 0 12px; }
 .pl-stage .pl-box > h2 { margin: 0 0 10px; padding: 7px 10px; font-size: 12px; border-radius: 6px; border: 0; }
-.pl-midcol { align-self: end; justify-self: center; width: min(320px, 100%); margin-top: 300px; }
+.pl-midcol { align-self: start; justify-self: center; width: min(320px, 100%); margin-top: 0; }
 .pl-right { position: sticky; top: calc(var(--header-h) + 12px); max-height: calc(100vh - var(--header-h) - 24px); overflow: auto; }
 .pl-stage .tw td, .pl-stage .tw th { border-color: rgba(255,255,255,.15); background: transparent; color: var(--ink); }
 .pl-stage .tw table { background: transparent; }
@@ -899,3 +899,44 @@ html.dark .card-acts .pl-primary { color: var(--on-red); }
   .gp-acts .btn small { display: block; font-size: 10px; opacity: .85; }
 }
 @media (max-width: 420px) { .lvtab { font-size: 9px; letter-spacing: 0; padding: 7px 3px; overflow-wrap: anywhere; } }
+
+/* item editor fields: clean 2-column grid, selects aligned on one baseline */
+.pl-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; gap: 12px 14px; }
+.pl-fields label { line-height: 1.35; }
+.pl-fields label > select { margin-top: 2px; }
+@media (max-width: 420px) { .pl-fields { grid-template-columns: minmax(0, 1fr); } }
+
+/* planner: Simulate DPS panel */
+.pl-simf { display: grid; gap: 8px; margin-bottom: 10px; }
+.pl-simf label { display: flex; flex-direction: column; gap: 3px; font: 400 11px var(--font-ui); text-transform: uppercase; letter-spacing: .4px; }
+.pl-simf label.pl-chk { flex-direction: row; text-transform: none; font: 13px var(--font-body); letter-spacing: 0; }
+.pl-simf select, .pl-simf input[type=number] { width: 100%; padding: 6px 8px; border-radius: 6px; font: 600 13px var(--font-body); }
+.pl-sim .tw td b { font-size: 15px; }
+
+/* planner: live DPS meter (same rules as the game's damage meter) */
+.pl-mt { border: 2px solid var(--border); border-radius: var(--radius); background: var(--panel-2); padding: 8px; margin: 4px 0 6px; }
+.pl-mt-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; margin-bottom: 6px; }
+.pl-mt-dps { font: 400 11px var(--font-pixel); letter-spacing: .2px; white-space: nowrap; }
+.pl-mt-clock { font: 400 11px var(--font-ui); color: var(--muted); white-space: nowrap; }
+.pl-mt-rows { display: grid; gap: 3px; min-height: 22px; }
+.pl-mt-row { position: relative; display: flex; align-items: center; gap: 6px; height: 22px; padding: 0 6px 0 3px; border-radius: 4px;
+  background: #e6ebf5; overflow: hidden; color: #14161f; font: 600 12px var(--font-body); }
+.pl-mt-row > i { position: absolute; left: 0; top: 0; bottom: 0; opacity: .85; transition: width .2s linear; }
+.pl-mt-row > * { position: relative; }
+.pl-mt-row .pl-mt-ic { width: 18px; height: 18px; image-rendering: pixelated; flex: none; }
+.pl-mt-n { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pl-mt-row b { font-variant-numeric: tabular-nums; }
+.pl-mt-empty { margin: 0; font-size: 12px; color: var(--muted); }
+.pl-mt-bar { height: 4px; border-radius: 2px; background: var(--panel-3); margin: 8px 0 6px; overflow: hidden; }
+.pl-mt-bar i { display: block; height: 100%; width: 0; background: var(--red); }
+.pl-mt-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.pl-mt-ctl .btn { padding: 4px 8px; font-size: 11px; min-height: 0; }
+.pl-mt-spl { margin-left: 4px; font: 400 10px var(--font-ui); color: var(--muted); text-transform: uppercase; }
+.pl-mt-sp.on { background: var(--red); color: var(--on-red); }
+
+.pl-mt-hp { position: relative; height: 18px; border: 2px solid var(--border); border-radius: 4px; background: var(--panel-3); margin: 0 0 6px; overflow: hidden; }
+.pl-mt-hp i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background: var(--red); transition: width .2s linear; }
+.pl-mt-hp span { position: relative; display: block; text-align: center; font: 600 11px/14px var(--font-body); color: #fff; text-shadow: 1px 1px 0 #000; font-variant-numeric: tabular-nums; }
+.pl-mt-msg { margin: 0; font: 600 12px var(--font-body); }
+.pl-mt-msg:empty { display: none; }
+.pl-mt-msg.ok { color: var(--green); margin-bottom: 6px; } .pl-mt-msg.bad { color: var(--red); margin-bottom: 6px; }
