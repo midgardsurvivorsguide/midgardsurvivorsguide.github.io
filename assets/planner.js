@@ -159,7 +159,11 @@
     simDark: ["Niflheim (Hel): more damage", "Niflheim (Hel): mais dano", "Niflheim (Hel): más daño", "尼芙爾海姆（Hel）：更多傷害"],
     simLight: ["Valhalla: more life", "Valhalla: mais vida", "Valhalla: más vida", "英靈殿：更多生命"],
     simMin: ["Your run duration (minutes)", "Duração da sua run (minutos)", "Duración de tu partida (minutos)", "你的遊戲時長（分鐘）"],
-    simAcct: ["Use my numbers from Character and account", "Usar meus números de Personagem e conta", "Usar mis números de Personaje y cuenta", "使用角色與帳號中的數值"],
+    simAcct: ["Use the run bonuses from the Character and account tab (Hel marks, raids won, god altars) instead of the average",
+      "Usar os bônus de run da aba Personagem e conta (Marcas de Hel, raids vencidas, altares de deuses) em vez da média",
+      "Usar los bonos de partida de la pestaña Personaje y cuenta (Marcas de Hel, incursiones ganadas, altares de dioses) en vez del promedio",
+      "使用「角色與帳號」分頁中的遊戲加成（Hel 印記、勝利的襲擊、神之祭壇），而非平均值"],
+    simAcctShort: ["Your run bonuses (Character and account tab)", "Seus bônus de run (aba Personagem e conta)", "Tus bonos de partida (pestaña Personaje y cuenta)", "你的遊戲加成（角色與帳號分頁）"],
     simGo: ["Simulate", "Simular", "Simular", "模擬"],
     simEmp: ["Emperiums (60 s Festival)", "Emperiums (Festival de 60 s)", "Emperiums (Festival de 60 s)", "Emperium（60 秒祭典）"],
     simDps: ["DPS", "DPS", "DPS", "DPS"],
@@ -171,10 +175,10 @@
     simAltarsAll: ["god altars", "altares de deus", "altares de dioses", "神壇"],
     simKarma: ["Hel altars", "altares de Hel", "altares de Hel", "Hel 神壇"], simKarmaL: ["Baldur altars", "altares de Baldur", "altares de Baldur", "Baldur 神壇"],
     simMarks: ["Hel Marks", "Hel Marks", "Hel Marks", "Hel 印記"], simBoons: ["raids won", "raids vencidas", "incursiones ganadas", "勝利的襲擊"],
-    simNote: ["Averages from the game's own timers: an altar every 60–90 s (you pray at every Valkyrie and Freyja), a corrupt demon every 110–160 s (Hel Mark on Niflheim), a karma altar every 150–210 s, one path raid every 8 min. Real runs vary with luck and choices.",
-      "Médias tiradas dos tempos do próprio jogo: um altar a cada 60–90 s (rezando em todo Valkyrie e Freyja), um demônio corrompido a cada 110–160 s (Hel Mark no Niflheim), um altar de karma a cada 150–210 s, uma raid de caminho a cada 8 min. Runs reais variam com sorte e escolhas.",
-      "Promedios de los tiempos del propio juego: un altar cada 60–90 s (rezando en todo Valkyrie y Freyja), un demonio corrupto cada 110–160 s (Hel Mark en Niflheim), un altar de karma cada 150–210 s, una incursión de ruta cada 8 min. Las partidas reales varían con la suerte y las decisiones.",
-      "依遊戲本身的計時取平均：每 60–90 秒一座神壇（每座 Valkyrie 與 Freyja 都祈禱）、每 110–160 秒一個腐化惡魔（尼芙爾海姆的 Hel 印記）、每 150–210 秒一座業力神壇、每 8 分鐘一次路線襲擊。實際遊戲會因運氣與選擇而不同。"],
+    simNote: ["Averages from the game's own timers: a god altar every 60–90 s (you pray at every one), a corrupt demon every 110–160 s (Hel Mark on Niflheim), a karma altar every 150–210 s. The first MVP comes at 8:00 (60 s earlier per Valkyrie altar), then one every 160 s in endless mode; every MVP you beat opens a path raid, and each path raid won is one boon. The run clock stops during raids. Real runs vary with luck and choices.",
+      "Médias tiradas dos tempos do próprio jogo: um altar de deus a cada 60–90 s (você reza em todos), um demônio corrompido a cada 110–160 s (Hel Mark no Niflheim), um altar de karma a cada 150–210 s. O primeiro MVP vem aos 8:00 (60 s antes por altar de Valkyrie) e depois um a cada 160 s no modo infinito; cada MVP vencido abre uma raid de caminho, e cada raid de caminho vencida é uma bênção. O relógio da run para durante as raids. Runs reais variam com sorte e escolhas.",
+      "Promedios de los tiempos del propio juego: un altar de dios cada 60–90 s (rezas en todos), un demonio corrupto cada 110–160 s (Hel Mark en Niflheim), un altar de karma cada 150–210 s. El primer MVP llega a las 8:00 (60 s antes por altar de Valkyrie) y luego uno cada 160 s en modo infinito; cada MVP vencido abre una incursión de ruta, y cada incursión ganada es una bendición. El reloj de la partida se detiene durante las incursiones. Las partidas reales varían con la suerte y las decisiones.",
+      "依遊戲本身的計時取平均：每 60–90 秒一座神壇（每座都祈禱）、每 110–160 秒一個腐化惡魔（尼芙爾海姆的 Hel 印記）、每 150–210 秒一座業力神壇。第一隻 MVP 在 8:00 出現（每座 Valkyrie 神壇提前 60 秒），之後無盡模式每 160 秒一隻；每擊敗一隻 MVP 會開啟路線襲擊，每贏一次路線襲擊得一個祝福。襲擊期間遊戲計時會暫停。實際遊戲會因運氣與選擇而不同。"],
     simMvpNote: ["MVP: it stands still and uses no mechanics; you hit until it dies. Its health follows the game (mvp_raid.gd): at least your measured DPS × 1.3 × 45 s × the boss's own multiplier, so it lasts about 58 s of your damage on a neutral target and grows as your damage grows. From 40 s on, Ymir's Heart raises your damage. The element table applies per hit type (basic attack = weapon element, Heal and Holy Light = Holy, Envenom = Poison).",
       "MVP: fica parado e não usa mecânicas; você bate até ele morrer. A vida segue o jogo (mvp_raid.gd): no mínimo seu DPS medido × 1,3 × 45 s × o multiplicador do chefe, então dura uns 58 s do seu dano num alvo neutro e cresce junto com o seu dano. A partir dos 40 s o Coração de Ymir aumenta seu dano. A tabela de elementos vale por tipo de golpe (ataque básico = elemento da arma, Heal e Holy Light = Sagrado, Envenom = Veneno).",
       "MVP: se queda quieto y no usa mecánicas; golpeas hasta que muere. Su vida sigue al juego (mvp_raid.gd): como mínimo tu DPS medido × 1,3 × 45 s × el multiplicador del jefe, así que dura unos 58 s de tu daño en un objetivo neutro y crece con tu daño. Desde los 40 s el Corazón de Ymir sube tu daño. La tabla de elementos se aplica por tipo de golpe (ataque básico = elemento del arma, Heal y Holy Light = Sagrado, Envenom = Veneno).",
@@ -892,7 +896,7 @@
         row(t("simDps"), "<b>" + big(r.dps) + "</b>") + row(t(r.boss_hp ? "simTotalAll" : "simTotal"), big(r.total)) +
         row(t("simWeapon"), esc(elName(r.weapon_el))) + (r.el ? row(t("simTgtEl"), esc(elName(r.el))) : "") + "</tbody></table></div>";
       var a = r.acct || {}, ga = (a.gods || []).length, ka = (a.karma_altars || []).length;
-      body += '<p class="pl-row"><b>' + (r.estimate ? t("simEst") + " (" + o.minutes + " min)" : t("simAcct")) + ":</b> ~" + ga + " " + t(r.estimate ? "simAltars" : "simAltarsAll") + " · ~" + ka + " " + t(a.path === "light" ? "simKarmaL" : "simKarma") +
+      body += '<p class="pl-row"><b>' + (r.estimate ? t("simEst") + " (" + o.minutes + " min)" : t("simAcctShort")) + ":</b> ~" + ga + " " + t("simAltarsAll") + " · ~" + ka + " " + t(a.path === "light" ? "simKarmaL" : "simKarma") +
         (a.path === "light" ? "" : " · ~" + a.marks + " " + t("simMarks")) + " · ~" + a.boons + " " + t("simBoons") + "</p>";
       body += '<p class="pl-note muted">' + (r.estimate ? t("simNote") + " " : "") + (r.el ? t("simMvpNote") + " " : "") + t("simUnsup") + ' <span class="muted">engine ' + esc(r.version || CALCV) + "</span></p>";
     }
