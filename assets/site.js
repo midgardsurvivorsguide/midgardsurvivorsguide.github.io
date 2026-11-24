@@ -63,32 +63,68 @@
   document.addEventListener("click", function (e) { if (!e.target.closest || !e.target.closest(".dd")) closeAll(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(); });
 
-  /* home: difficulty tabs (remembered; #beginner / #intermediate / #advanced also work) */
+  /* home: difficulty tabs + class filter, one state kept in the URL as #<level> or #<level>/<class>.
+     The level is remembered between visits; the class filter only lives in the URL and survives tab changes. */
   var lvtabs = document.querySelectorAll(".lvtab");
   if (lvtabs.length) {
-    var showLevel = function (lv, push) {
+    var hb = document.querySelector(".homebar"), chips = document.querySelectorAll(".clschip");
+    var home = { lv: "beginner", cls: "" };
+    var okLv = function (v) { return v === "beginner" || v === "intermediate" || v === "advanced" || v === "public"; };
+    var okCls = function (v) { return !!v && !!document.querySelector('.clschip[data-cls="' + v + '"]'); };
+    var render = function () {
+      var lv = home.lv, cls = home.cls;
       lvtabs.forEach(function (t) { t.setAttribute("aria-selected", t.getAttribute("data-lv") === lv ? "true" : "false"); });
-      document.querySelectorAll(".lvpanel").forEach(function (p) { p.hidden = p.getAttribute("data-lv") !== lv; });
-      var hb = document.querySelector(".homebar"); if (hb) hb.setAttribute("data-lv", lv);
-      try { localStorage.setItem("homeLevel", lv); } catch (e) {}
-      if (push && history.replaceState) history.replaceState(null, "", "#" + lv);
+      document.querySelectorAll(".lvpanel").forEach(function (p) {
+        p.hidden = p.getAttribute("data-lv") !== lv;
+        p.querySelectorAll(".card").forEach(function (c) {
+          /* a class with no build here: its "coming soon" card gives way to the empty state below */
+          c.classList.toggle("is-off", !!cls && (c.getAttribute("data-cls") !== cls || c.classList.contains("soon")));
+        });
+        p.querySelectorAll(".cls-empty").forEach(function (e) { e.hidden = e.getAttribute("data-cls") !== cls; });
+      });
+      chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-cls") === cls ? "true" : "false"); });
+      /* phones: the class bar scrolls sideways, so bring the chosen chip into it */
+      var on = cls && document.querySelector('.clschip[data-cls="' + cls + '"]'), cb = on && on.parentElement;
+      if (cb && cb.scrollWidth > cb.clientWidth) cb.scrollLeft = on.offsetLeft - cb.offsetLeft - (cb.clientWidth - on.offsetWidth) / 2;
+      if (hb) { hb.setAttribute("data-lv", lv); hb.classList.toggle("filtering", !!cls); }
+      var bar = document.querySelector(".clsfilter");
+      if (bar) {
+        bar.hidden = !cls;
+        var chip = cls && document.querySelector('.clschip[data-cls="' + cls + '"] span');
+        bar.querySelector(".clsfilter-name").textContent = chip ? chip.textContent : "";
+      }
     };
-    lvtabs.forEach(function (t) { t.addEventListener("click", function () { showLevel(t.getAttribute("data-lv"), true); }); });
-    var h = (location.hash || "").replace("#", ""), saved = null;
-    try { saved = localStorage.getItem("homeLevel"); } catch (e) {}
-    var ok = function (v) { return v === "beginner" || v === "intermediate" || v === "advanced" || v === "public"; };
-    showLevel(ok(h) ? h : ok(saved) ? saved : "beginner", false);
-  }
-
-  /* home: class bar scrolls to that class's card in the open difficulty */
-  document.querySelectorAll(".clschip").forEach(function (c) {
-    c.addEventListener("click", function () {
-      var panel = document.querySelector(".lvpanel:not([hidden])"); if (!panel) return;
-      var card = panel.querySelector('.card[data-cls="' + c.getAttribute("data-cls") + '"]'); if (!card) return;
-      card.scrollIntoView({ behavior: "smooth", block: "start" });
-      card.classList.remove("flash"); void card.offsetWidth; card.classList.add("flash");
+    var set = function (lv, cls, write) {
+      home.lv = lv; home.cls = cls; render();
+      try { localStorage.setItem("homeLevel", lv); } catch (e) {}
+      if (write && history.replaceState) history.replaceState(null, "", "#" + lv + (cls ? "/" + cls : ""));
+    };
+    /* after a filter change, bring the top of the list back into view if the user had scrolled past it */
+    var toTop = function () {
+      var p = document.querySelector(".lvpanel:not([hidden])"); if (!p || !hb) return;
+      var y = p.getBoundingClientRect().top - hb.getBoundingClientRect().bottom - 14;
+      if (y < 0) window.scrollBy({ top: y, behavior: "smooth" });
+    };
+    var fromHash = function () {
+      var parts = (location.hash || "").replace("#", "").split("/"), saved = null;
+      try { saved = localStorage.getItem("homeLevel"); } catch (e) {}
+      set(okLv(parts[0]) ? parts[0] : okLv(saved) ? saved : "beginner", okCls(parts[1]) ? parts[1] : "", false);
+    };
+    lvtabs.forEach(function (t) { t.addEventListener("click", function () { set(t.getAttribute("data-lv"), home.cls, true); }); });
+    chips.forEach(function (c) {
+      c.addEventListener("click", function () {
+        var id = c.getAttribute("data-cls");
+        set(home.lv, home.cls === id ? "" : id, true); toTop();   /* clicking the active class again clears it */
+      });
     });
-  });
+    var clr = document.querySelector(".clsclear");
+    if (clr) clr.addEventListener("click", function () { set(home.lv, "", true); });
+    document.querySelectorAll("[data-golv]").forEach(function (b) {
+      b.addEventListener("click", function () { set(b.getAttribute("data-golv"), home.cls, true); toTop(); });
+    });
+    window.addEventListener("hashchange", fromHash);
+    fromHash();
+  }
 
   /* mobile menu */
   var mb = document.getElementById("menubtn");
@@ -137,5 +173,13 @@
     var a = e.target.closest && e.target.closest(".toc a[href^='#']"); if (!a) return;
     var s = document.getElementById(a.getAttribute("href").slice(1));
     if (s && s.classList.contains("collapsed")) setOpen(s, true);
+  });
+
+  /* guide build panel: copy the page link (without the hash) */
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".gp-copy"); if (!b) return;
+    var url = location.origin + location.pathname, old = b.innerHTML;
+    var done = function () { b.textContent = "✓"; setTimeout(function () { b.innerHTML = old; }, 1400); };
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, function () { prompt("", url); }); else prompt("", url);
   });
 })();
