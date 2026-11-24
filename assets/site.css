@@ -943,7 +943,8 @@ html.dark .card-acts .pl-primary { color: var(--on-red); }
 
 /* planner: Simulate DPS dropdown in the top bar */
 .pl-top { position: relative; }
-.pl-simwrap { margin-left: auto; padding-bottom: 8px; align-self: flex-end; }
+.pl-impwrap { margin-left: auto; padding-bottom: 8px; align-self: flex-end; }
+.pl-simwrap { padding-bottom: 8px; align-self: flex-end; }
 .pl-simbtn { background: var(--red); border-color: var(--red); color: var(--on-red); font-size: 12px; padding: 5px 12px; }
 .pl-simdd { position: absolute; right: 10px; top: calc(100% + 6px); z-index: 60; width: min(440px, calc(100vw - 32px)); max-height: min(78vh, 760px); overflow: auto;
   background: rgba(20,18,16,.96); border: 1px solid rgba(255,255,255,.35); border-radius: var(--radius); padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.6); backdrop-filter: blur(4px); }
@@ -957,3 +958,13 @@ html.dark .card-acts .pl-primary { color: var(--on-red); }
 .pl-simdd #pl-sim-body > :not(.pl-simf) { margin-top: 16px; }
 .pl-simdd #pl-sim-body > .pl-note { margin-top: 10px; }
 .pl-simdd .pl-wide { width: 100%; }
+
+/* planner: Import from game dropdown */
+.pl-impbtn { background: rgba(255,255,255,.08); color: #f1eee6; border-color: rgba(255,255,255,.45); font-size: 12px; padding: 5px 12px; }
+.pl-imp textarea { width: 100%; box-sizing: border-box; margin: 10px 0; padding: 8px 10px; border-radius: 6px; font: 13px var(--font-body); resize: vertical;
+  background: rgba(0,0,0,.35); color: var(--ink); border: 1px solid rgba(255,255,255,.3); }
+.pl-imp-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.pl-imp-row .btn { font-size: 12px; padding: 6px 14px; }
+.pl-imp-file { cursor: pointer; background: rgba(255,255,255,.08); color: #f1eee6; border-color: rgba(255,255,255,.45); }
+.pl-imp-rep { margin-top: 14px; padding: 10px 12px; border: 1px solid rgba(255,255,255,.2); border-radius: 6px; background: rgba(255,255,255,.05); font-size: 13px; }
+.pl-imp-rep p { margin: 0 0 6px; } .pl-imp-rep p:last-child { margin-bottom: 0; }

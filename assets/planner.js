@@ -153,6 +153,34 @@
     upFull: ["Account upgrades (Kafra, Sage...) at max", "Upgrades da conta (Kafra, Sage...) no máximo", "Mejoras de cuenta (Kafra, Sage...) al máximo", "帳號強化（Kafra、Sage…）全滿"],
     stew: ["Extra HP from Immortal Stew", "HP extra do Immortal Stew", "HP extra de Immortal Stew", "Immortal Stew 額外 HP"],
     sheet: ["Character sheet", "Ficha do personagem", "Ficha del personaje", "角色數據"],
+    imp: ["Import from game", "Importar do jogo", "Importar del juego", "從遊戲匯入"],
+    impHelp: ["Paste the link from the game's Export build button (midgardsurvivors.com/build/#...), just the code, or the long MSB1 link. You can also drop the PDF.",
+      "Cole o link do botão Exportar build do jogo (midgardsurvivors.com/build/#...), só o código, ou o link longo MSB1. Também dá para soltar o PDF.",
+      "Pega el enlace del botón Exportar build del juego (midgardsurvivors.com/build/#...), solo el código o el enlace largo MSB1. También puedes soltar el PDF.",
+      "貼上遊戲「匯出配裝」按鈕的連結（midgardsurvivors.com/build/#...）、只有代碼，或 MSB1 長連結。也可以拖入 PDF。"],
+    impWhere: ["In the game: end-of-run screen, Export build; or Album, History tab, Export on any run.",
+      "No jogo: tela de fim de run, Exportar build; ou Álbum, aba Historial, Exportar em qualquer run.",
+      "En el juego: pantalla de fin de partida, Exportar build; o Álbum, pestaña Historial, Exportar en cualquier partida.",
+      "遊戲中：結算畫面的「匯出配裝」，或圖鑑「歷史」分頁中任一場的「匯出」。"],
+    impGo: ["Import", "Importar", "Importar", "匯入"], impPdf: ["Choose PDF", "Escolher PDF", "Elegir PDF", "選擇 PDF"],
+    impLoading: ["Loading build...", "Carregando build...", "Cargando build...", "載入配裝中..."],
+    impBad: ["That is not a build link, code or MSB1 text.", "Isso não é um link, código ou texto MSB1 de build.", "Eso no es un enlace, código o texto MSB1 de build.", "這不是配裝連結、代碼或 MSB1 文字。"],
+    impMissing: ["The game's server did not find that build. Check the link.", "O servidor do jogo não achou essa build. Confira o link.", "El servidor del juego no encontró esa build. Revisa el enlace.", "遊戲伺服器找不到這個配裝，請檢查連結。"],
+    impNet: ["Could not reach the game's server. Try the long MSB1 link.", "Não deu para falar com o servidor do jogo. Tente o link longo MSB1.", "No se pudo contactar el servidor del juego. Prueba el enlace largo MSB1.", "無法連線到遊戲伺服器，請改用 MSB1 長連結。"],
+    impNoUrl: ["No build link inside this PDF (it was printed without headers and footers). Copy the link from the build page instead.",
+      "Não há link da build neste PDF (foi impresso sem cabeçalho e rodapé). Copie o link da página da build.",
+      "No hay enlace de la build en este PDF (se imprimió sin encabezado ni pie). Copia el enlace de la página de la build.",
+      "此 PDF 內沒有配裝連結（列印時關閉了頁首頁尾）。請改從配裝頁面複製連結。"],
+    impCount: ["%g gear pieces · %s skills · %p pacts · %a god altars · %r raids won · %m Hel Marks",
+      "%g peças · %s skills · %p pactos · %a altares de deus · %r raids vencidas · %m Marcas de Hel",
+      "%g piezas · %s habilidades · %p pactos · %a altares de dioses · %r incursiones ganadas · %m Marcas de Hel",
+      "%g 件裝備 · %s 個技能 · %p 個契約 · %a 座神壇 · 勝利 %r 次襲擊 · %m 個 Hel 印記"],
+    impDone: ["Imported", "Importado", "Importado", "已匯入"], impMiss: ["Not imported", "Não importado", "No importado", "未匯入"],
+    impNote: ["Your current build was replaced (Undo brings it back). Simulate DPS now uses this run's bonuses.",
+      "Sua build atual foi substituída (Desfazer traz de volta). O Simular DPS agora usa os bônus desta run.",
+      "Tu build actual se reemplazó (Deshacer la recupera). Simular DPS ahora usa los bonos de esta partida.",
+      "目前的配裝已被取代（復原可還原）。模擬 DPS 現在使用這場的加成。"],
+    impVer: ["Exported from game version %s; the planner is on %s.", "Exportado da versão %s do jogo; o planner está na %s.", "Exportado de la versión %s del juego; el planificador está en la %s.", "匯出自遊戲版本 %s；規劃器為 %s。"],
     sim: ["Simulate DPS", "Simular DPS", "Simular DPS", "模擬 DPS"],
     simTarget: ["Target", "Alvo", "Objetivo", "目標"],
     simPath: ["Run path", "Caminho da run", "Ruta de la partida", "路線"],
@@ -626,9 +654,11 @@
       '<button class="btn" type="button" data-act="share">' + t("share") + '</button><button class="btn" type="button" data-act="save">' + t("save") + "</button>" +
       '<button class="btn" type="button" data-act="dup">' + t("dup") + '</button><button class="btn" type="button" data-act="image">' + t("img") + "</button>" +
       '<button class="btn" type="button" data-act="reset">' + t("reset") + '</button><button class="btn pl-primary" type="button" disabled title="' + esc(t("soon")) + '">' + t("optimize") + " <small>(" + t("soon") + ")</small></button></div>";
+    var impdd = '<div class="pl-impwrap"><button class="btn pl-impbtn" type="button" data-impdd aria-expanded="' + IMPOPEN + '">' + t("imp") +
+      ' <span aria-hidden="true">' + (IMPOPEN ? "▴" : "▾") + '</span></button><div class="pl-simdd pl-impdd"' + (IMPOPEN ? "" : " hidden") + ">" + impBox() + "</div></div>";
     var simdd = '<div class="pl-simwrap"><button class="btn pl-primary pl-simbtn" type="button" data-simdd aria-expanded="' + SIMOPEN + '">' + t("sim") +
       ' <span aria-hidden="true">' + (SIMOPEN ? "▴" : "▾") + '</span></button><div class="pl-simdd"' + (SIMOPEN ? "" : " hidden") + '>' + sheetBox() + "</div></div>";
-    root.innerHTML = '<div class="pl-top"><div class="pl-tabs" role="tablist">' + tabs + "</div>" + acts + simdd + "</div>" +
+    root.innerHTML = '<div class="pl-top"><div class="pl-tabs" role="tablist">' + tabs + "</div>" + acts + impdd + simdd + "</div>" +
       '<div class="pl-stage"><div class="gp pl-left">' + leftHtml() + '<div id="pl-edit"></div></div>' +
       '<div class="pl-midcol"><div class="gp pl-mid">' + midHtml() + '</div><div class="gp">' + savedHtml() + "</div></div>" +
       '<div class="gp pl-right">' + rightHtml() + "</div></div>";
@@ -756,18 +786,185 @@
     o.gear = gear; o.album = (S.album || []).slice(0, albumCap());
     return o;
   }
+  /* ---------------- import from the game's build export (core/build_card.gd) ----------------
+     link midgardsurvivors.com/build/#CODE -> GET relay.midgardsurvivors.com/b/CODE -> "MSB1." + base64url(gzip(JSON)) */
+  var RELAY = "https://relay.midgardsurvivors.com/b/", IMPOPEN = false, IMPMSG = "", IMPREP = null;
+  function impParse(txt) {
+    txt = String(txt || "").trim();
+    var m = txt.match(/MSB1\.[A-Za-z0-9_-]+/); if (m) return { packed: m[0] };
+    m = txt.match(/midgardsurvivors\.com\/build\/?#([0-9A-Za-z]{8}(?:[0-9A-Za-z]{4})?)\b/); if (m) return { code: m[1].toUpperCase() };
+    if (/^[0-9A-Za-z]{8}([0-9A-Za-z]{4})?$/.test(txt)) return { code: txt.toUpperCase() };
+    return null;
+  }
+  function impUnpack(packed) {
+    return pipe(unb64u(packed.slice(5)), new DecompressionStream("gzip")).then(function (u8) { return JSON.parse(new TextDecoder().decode(u8)); });
+  }
+  function impFetch(src) {
+    if (src.packed) return impUnpack(src.packed);
+    return fetch(RELAY + src.code).then(function (r) {
+      if (r.status === 404) throw new Error("missing");
+      if (!r.ok) throw new Error("net");
+      return r.text();
+    }, function () { throw new Error("net"); }).then(function (t) { t = t.trim(); if (t.indexOf("MSB1.") !== 0) throw new Error("bad"); return impUnpack(t); });
+  }
+  function impPdf(file) {          // the official PDF is the page printed by the browser: its footer carries the page URL
+    var V = "3.11.174", base = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/" + V + "/";
+    var ready = window.pdfjsLib ? Promise.resolve() : new Promise(function (ok, no) {
+      var sc = document.createElement("script"); sc.src = base + "pdf.min.js"; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc);
+    });
+    return ready.then(function () {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = base + "pdf.worker.min.js";
+      return file.arrayBuffer();
+    }).then(function (buf) { return window.pdfjsLib.getDocument({ data: buf }).promise; }).then(function (pdf) {
+      var all = [];
+      for (var i = 1; i <= pdf.numPages; i++) all.push(pdf.getPage(i).then(function (pg) {
+        return Promise.all([pg.getTextContent(), pg.getAnnotations()]).then(function (x) {
+          return x[0].items.map(function (it) { return it.str; }).join("") + " " + x[1].map(function (a) { return a.url || ""; }).join(" ");
+        });
+      }));
+      return Promise.all(all);
+    }).then(function (pages) { return impParse(pages.join(" ").replace(/\s+/g, "")); });
+  }
+  function impTpl(tpl) { return new RegExp("^" + tpl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace("%s", "([0-9]+(?:[.,][0-9]+)?)").replace(/%%/g, "%") + "$", "i"); }
+  function impLines(g) { return ((g.item && g.item.foot) || []).map(function (x) { return String(x[0] || ""); }); }
+  function impPot(lines, lg, miss, where) {
+    var out = [];
+    lines.forEach(function (ln) {
+      if (ln.indexOf("  ") !== 0 || ln.indexOf("   ") === 0) return;           // 2 spaces = potential line, 3 = proc detail
+      var perfect = /★\s*$/.test(ln), txt = ln.replace(/★/g, "").trim(), hit = null;
+      Object.keys(D.pot).some(function (k) {
+        return [lg, "en", "pt", "es", "zh"].some(function (l) {
+          var tp = D.pot[k].txt && D.pot[k].txt[l]; if (!tp) return false;
+          var m = txt.match(impTpl(tp)); if (!m) return false;
+          var v = parseFloat(m[1].replace(",", ".")) / 100, vs = D.pot[k].v, best = 0;
+          vs.forEach(function (x, i) { if (Math.abs(x - v) < Math.abs(vs[best] - v)) best = i; });
+          hit = { k: k, t: perfect ? vs.length : Math.min(best + 1, vs.length - 1) }; return true;
+        });
+      });
+      if (hit) out.push(hit); else miss.push(where + ": " + txt);
+    });
+    return out.slice(0, 3);
+  }
+  function impTrait(lines) {
+    var ln = lines.filter(function (x) { return x.indexOf("◆") === 0; })[0]; if (!ln) return null;
+    var nm = ln.replace(/^◆\s*/, "").split(/[:：]/)[0].trim().toLowerCase();
+    return Object.keys(D.traits).filter(function (k) { var n = D.traits[k].n; return Object.keys(n).some(function (l) { return String(n[l]).toLowerCase() === nm; }); })[0] || null;
+  }
+  function impGrade(lines) {
+    for (var i = 0; i < lines.length; i++) { var m = lines[i].match(/^\S+\s+([DCBAS])\s*[:：]/); if (m) return D.weaponGrades.indexOf(m[1]); }
+    return 0;
+  }
+  function impIcon(path) { return String(path || "").split("/").pop(); }
+  function impFirstInt(s) { var m = String(s || "").match(/(\d+)/); return m ? +m[1] : 0; }
+  function impBuild(doc) {
+    var h = doc.hero || {}, run = doc.run || {}, lg = (doc.lang || "en").slice(0, 2), ok = [], miss = [];
+    var c = D.classes.filter(function (x) { return x.id === h.job; })[0] || D.classes.filter(function (x) { return x.id === h.class; })[0];
+    if (!c) throw new Error("class " + (h.job || h.class));
+    var o = fresh(c.id), GI = D.gameIcons || {};
+    o.name = (h.name ? h.name + " · " : "") + (h.title || c.name); o.reborn = !!h.reborn; o.lv = +h.level || 1;
+    // gear
+    (doc.gear || []).forEach(function (g) {
+      if (SLOT_ORDER.indexOf(g.slot) < 0) return;
+      var title = (g.item && g.item.title) || g.id, id = g.id;
+      if (g.slot === "wings" && /\bHel\b/.test(title) && D.items.hel_wings) id = "hel_wings";
+      if (!D.items[id]) { miss.push(g.slot + ": " + title); return; }
+      var it = D.items[id], lines = impLines(g), item = { id: id, cards: [], refine: +g.refine || 0, grade: 0, trait: null, pot: [], extra: 0, slots: 0 };
+      item.slots = natSlots(item);
+      item.extra = Math.max(0, Math.min(extraCap(it), (+g.sockets || 0) - item.slots));
+      (g.cards || []).forEach(function (cd) { var cid = impIcon(cd.icon); if (D.cards[cid]) item.cards.push(cid); else miss.push(g.slot + ": " + (cd.title || cid)); });
+      item.grade = Math.max(0, impGrade(lines));
+      item.trait = impTrait(lines);
+      item.pot = impPot(lines, lg, miss, title);
+      o.gear[g.slot] = item;
+    });
+    // stats, skills, album, plagiarism
+    (doc.stats || []).forEach(function (st) { if (STATS.indexOf(st.id) >= 0) { o.base[st.id] = +st.base || 0; o.run[st.id] = Math.max(0, (+st.value || 0) - (+st.base || 0)); } });
+    (doc.skills || []).forEach(function (sk) {
+      var id = sk.id, lv = +sk.lv || 0;
+      if (/_x$/.test(id) && sk.evolved) { id = id.slice(0, -2); lv = 5 + lv - 1; }   // evolve(): EX level = 1 + (level - MAX_SKILL_LEVEL)
+      if (upInfo(id) && STATS.indexOf(id) < 0) o.skl[id] = lv; else miss.push(sk.id);
+    });
+    o.album = (doc.album || []).map(function (a) { return a.id; }).filter(function (x) { return D.cards[x]; });
+    o.plag = (doc.copies || []).map(function (cp) { return (GI.plag || {})[impIcon(cp.icon)]; }).filter(function (x) { return x && D.plag[x]; });
+    // pet (extra row with the tame item icon), pacts, dishes, altars, marks and boons (the run's buff row)
+    (doc.extra || []).forEach(function (e) { var pid = (GI.pets || {})[impIcon(e.icon)]; if (pid && D.pets[pid]) o.pet = pid; });
+    var godNames = {}; for (var gd in GI.gods || {}) godNames[gd] = String(GI.gods[gd]).replace(/^(El|La)\s+/, "");
+    (doc.buffs || []).forEach(function (b) {
+      var ic = impIcon(b.icon), title = String(b.title || "");
+      if ((GI.pacts || {})[ic] && D.pacts[GI.pacts[ic]]) { if (o.pacts.length < D.rules.maxPacts) o.pacts.push(GI.pacts[ic]); return; }
+      if ((GI.dishes || {})[ic] && D.dishes[GI.dishes[ic]]) { if (o.dishes.length < D.rules.chefMax) o.dishes.push(GI.dishes[ic]); return; }
+      if (ic === "over_thrust") { o.acct.marks = impFirstInt(b.tag); return; }                           // Mark of Hel (hud.gd)
+      if (ic === "soul_drain" || ic === "assumptio") { o.acct.boons = impFirstInt(b.tag); return; }       // Pact of Hel / Blessing of Valhalla
+      var x = String(b.tag || "").match(/[x×]\s*(\d+)/);
+      if (x) for (var gid in godNames) if (godNames[gid] && new RegExp("\\b" + godNames[gid] + "\\b", "i").test(title)) { o.acct.gods[gid] = (o.acct.gods[gid] || 0) + (+x[1]); break; }
+    });
+    o.acct.upFull = true;
+    o.sim = { target: "emperium", path: run.route === "light" ? "light" : "dark", minutes: 40, acct: true };
+    var gods = 0; for (var k in o.acct.gods) gods += o.acct.gods[k];
+    ok.push(t("impCount").replace("%g", Object.keys(o.gear).length).replace("%s", Object.keys(o.skl).length).replace("%p", o.pacts.length)
+      .replace("%a", gods).replace("%r", o.acct.boons).replace("%m", o.acct.marks));
+    return { state: o, ok: ok, miss: miss, ver: doc.ver, who: (h.name || "") + " · " + (h.title || c.name) + " Lv " + (h.level || "?") };
+  }
+  function impRun(src) {
+    if (!src) { IMPMSG = t("impBad"); IMPREP = null; drawImp(); return; }
+    IMPMSG = t("impLoading"); IMPREP = null; drawImp();
+    impFetch(src).then(function (doc) {
+      var r = impBuild(doc);
+      S = clean(r.state); persist(); IMPMSG = ""; IMPREP = r; editSlot = null; SIMRES = null; render();
+    }).catch(function (e) {
+      var k = String(e && e.message); IMPREP = null; IMPMSG = k === "missing" ? t("impMissing") : k === "net" ? t("impNet") : t("impBad") + (k && k !== "bad" ? " (" + k + ")" : ""); drawImp();
+    });
+  }
+  function impBox() {
+    return '<div class="pl-imp" id="pl-imp-body"></div>';
+  }
+  function drawImp() {
+    var el = document.getElementById("pl-imp-body"); if (!el) return;
+    var rep = "";
+    if (IMPREP) {
+      rep = '<div class="pl-imp-rep"><p><b>' + t("impDone") + ":</b> " + esc(IMPREP.who) + "</p><p>" + IMPREP.ok.map(esc).join(" · ") + "</p>" +
+        (IMPREP.miss.length ? "<p><b>" + t("impMiss") + ":</b> " + IMPREP.miss.map(esc).join(", ") + "</p>" : "") +
+        (IMPREP.ver && IMPREP.ver !== D.v ? '<p class="muted">' + esc(t("impVer").replace("%s", IMPREP.ver).replace("%s", D.v)) + "</p>" : "") +
+        '<p class="muted">' + t("impNote") + "</p></div>";
+    }
+    el.innerHTML = '<p class="pl-note">' + t("impHelp") + '</p><textarea data-imp="txt" rows="2" spellcheck="false" placeholder="https://midgardsurvivors.com/build/#..."></textarea>' +
+      '<div class="pl-imp-row"><button class="btn pl-primary" type="button" data-imp="go">' + t("impGo") + '</button><label class="btn pl-imp-file">' + t("impPdf") +
+      '<input type="file" accept="application/pdf,.pdf" data-imp="pdf" hidden></label></div>' +
+      (IMPMSG ? '<p class="pl-note">' + esc(IMPMSG) + "</p>" : "") + rep + '<p class="pl-note muted">' + t("impWhere") + "</p>";
+    var ta = el.querySelector('[data-imp="txt"]');
+    el.querySelector('[data-imp="go"]').onclick = function () { impRun(impParse(ta.value)); };
+    ta.onkeydown = function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); impRun(impParse(ta.value)); } };
+    var file = function (f) {
+      if (!f) return; IMPMSG = t("impLoading"); IMPREP = null; drawImp();
+      impPdf(f).then(function (src) { if (src) impRun(src); else { IMPMSG = t("impNoUrl"); drawImp(); } }, function () { IMPMSG = t("impNoUrl"); drawImp(); });
+    };
+    el.querySelector('[data-imp="pdf"]').onchange = function (e) { file(e.target.files[0]); };
+    el.ondragover = function (e) { e.preventDefault(); };
+    el.ondrop = function (e) { e.preventDefault(); var f = e.dataTransfer.files[0]; if (f && /pdf$/i.test(f.name)) file(f); else if (e.dataTransfer.getData("text")) impRun(impParse(e.dataTransfer.getData("text"))); };
+  }
+  function impToggle(open) {
+    IMPOPEN = open;
+    var dd = root.querySelector(".pl-impdd"), b = root.querySelector("[data-impdd]"); if (!dd || !b) return;
+    dd.hidden = !open; b.setAttribute("aria-expanded", open); b.querySelector("span").textContent = open ? "▴" : "▾";
+    if (open) { if (SIMOPEN) simToggle(false); drawImp(); var ta = dd.querySelector("textarea"); if (ta) ta.focus(); }
+  }
   var SIMOPEN = false, SIMDOC = false;
   function simToggle(open) {
     SIMOPEN = open;
     var dd = root.querySelector(".pl-simdd"), b = root.querySelector("[data-simdd]"); if (!dd || !b) return;
     dd.hidden = !open; b.setAttribute("aria-expanded", open); b.querySelector("span").textContent = open ? "▴" : "▾";
-    if (open) drawSim();
+    if (open) { if (IMPOPEN) impToggle(false); drawSim(); }
   }
   function wireSimDd() {
     var b = root.querySelector("[data-simdd]"); if (b) b.onclick = function () { simToggle(!SIMOPEN); };
+    var bi = root.querySelector("[data-impdd]"); if (bi) bi.onclick = function () { impToggle(!IMPOPEN); };
+    if (IMPOPEN) drawImp();
     if (SIMDOC) return; SIMDOC = true;                     // fecha ao clicar fora ou com Esc
-    document.addEventListener("mousedown", function (e) { if (SIMOPEN && !e.target.closest(".pl-simwrap")) simToggle(false); });
-    document.addEventListener("keydown", function (e) { if (SIMOPEN && e.key === "Escape") simToggle(false); });
+    document.addEventListener("mousedown", function (e) {
+      if (SIMOPEN && !e.target.closest(".pl-simwrap")) simToggle(false);
+      if (IMPOPEN && !e.target.closest(".pl-impwrap")) impToggle(false);
+    });
+    document.addEventListener("keydown", function (e) { if (e.key !== "Escape") return; if (SIMOPEN) simToggle(false); if (IMPOPEN) impToggle(false); });
   }
   function sheetBox() { return '<div class="pl-sim" id="pl-sim-body"></div>'; }
   function f2(v, d) { return (Math.round(v * Math.pow(10, d)) / Math.pow(10, d)).toLocaleString(); }
@@ -834,7 +1031,7 @@
     }
   }
   function mtBoss() { var m = (D.mvps || []).filter(function (x) { return x.id === simOpts().target; })[0]; return m ? m.n : "MVP"; }
-  function mtYmir(x) {                                          // mvp_raid.gd::_tick_ymir (RAID_YMIR_* 0.2.8)
+  function mtYmir(x) {                                          // mvp_raid.gd::_tick_ymir (RAID_YMIR_* 0.2.8 = 0.2.10)
     if (x <= 40) return 1; x -= 40;
     var y = x <= 60 ? x + x * x / 120 : 90 + 2 * (x - 60);
     return 1 + 0.08 * y;
