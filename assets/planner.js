@@ -158,7 +158,7 @@
     simPath: ["Run path", "Caminho da run", "Ruta de la partida", "路線"],
     simDark: ["Niflheim (Hel): more damage", "Niflheim (Hel): mais dano", "Niflheim (Hel): más daño", "尼芙爾海姆（Hel）：更多傷害"],
     simLight: ["Valhalla: more life", "Valhalla: mais vida", "Valhalla: más vida", "英靈殿：更多生命"],
-    simMin: ["Run time (minutes)", "Tempo de run (minutos)", "Tiempo de partida (minutos)", "遊戲時間（分鐘）"],
+    simMin: ["Your run duration (minutes)", "Duração da sua run (minutos)", "Duración de tu partida (minutos)", "你的遊戲時長（分鐘）"],
     simAcct: ["Use my numbers from Character and account", "Usar meus números de Personagem e conta", "Usar mis números de Personaje y cuenta", "使用角色與帳號中的數值"],
     simGo: ["Simulate", "Simular", "Simular", "模擬"],
     simEmp: ["Emperiums (60 s Festival)", "Emperiums (Festival de 60 s)", "Emperiums (Festival de 60 s)", "Emperium（60 秒祭典）"],
@@ -622,11 +622,13 @@
       '<button class="btn" type="button" data-act="share">' + t("share") + '</button><button class="btn" type="button" data-act="save">' + t("save") + "</button>" +
       '<button class="btn" type="button" data-act="dup">' + t("dup") + '</button><button class="btn" type="button" data-act="image">' + t("img") + "</button>" +
       '<button class="btn" type="button" data-act="reset">' + t("reset") + '</button><button class="btn pl-primary" type="button" disabled title="' + esc(t("soon")) + '">' + t("optimize") + " <small>(" + t("soon") + ")</small></button></div>";
-    root.innerHTML = '<div class="pl-top"><div class="pl-tabs" role="tablist">' + tabs + "</div>" + acts + "</div>" +
+    var simdd = '<div class="pl-simwrap"><button class="btn pl-primary pl-simbtn" type="button" data-simdd aria-expanded="' + SIMOPEN + '">' + t("sim") +
+      ' <span aria-hidden="true">' + (SIMOPEN ? "▴" : "▾") + '</span></button><div class="pl-simdd"' + (SIMOPEN ? "" : " hidden") + '>' + sheetBox() + "</div></div>";
+    root.innerHTML = '<div class="pl-top"><div class="pl-tabs" role="tablist">' + tabs + "</div>" + acts + simdd + "</div>" +
       '<div class="pl-stage"><div class="gp pl-left">' + leftHtml() + '<div id="pl-edit"></div></div>' +
       '<div class="pl-midcol"><div class="gp pl-mid">' + midHtml() + '</div><div class="gp">' + savedHtml() + "</div></div>" +
       '<div class="gp pl-right">' + rightHtml() + "</div></div>";
-    wire(); wireChar(); drawSheet();
+    wire(); wireChar(); wireSimDd(); drawSheet();
     if (editSlot) drawEditor();
   }
   function rightHtml() {
@@ -644,7 +646,7 @@
       (jbx ? '<p class="pl-note">' + t("classBonus") + ": +" + Math.round(jbx.dmg * 100) + "% " + esc(labelOf("dmg")) + ", +" + Math.round(jbx.hp * 100) + "% " + esc(labelOf("max_hp_pct")) + (jbx.more !== 1 ? ", ×" + jbx.more : "") + "</p>" : "") +
       (S.gear.soul && !soulOpen() ? '<p class="pl-note bad-note">' + t("soulOff") + "</p>" : "") +
       (specials ? "<h3>" + t("effects") + '</h3><ul class="pl-specials">' + specials + "</ul>" : "") +
-      '<p class="pl-note muted">' + t("totalsNote") + "</p></section>" + sheetBox();
+      '<p class="pl-note muted">' + t("totalsNote") + "</p></section>";
   }
 
   function chip(kind, key, ic, n, sub) {
@@ -750,7 +752,20 @@
     o.gear = gear; o.album = (S.album || []).slice(0, albumCap());
     return o;
   }
-  function sheetBox() { return '<section class="pl-box pl-sim" data-box="sim"><h2>' + t("sim") + '</h2><div id="pl-sim-body"></div></section>'; }
+  var SIMOPEN = false, SIMDOC = false;
+  function simToggle(open) {
+    SIMOPEN = open;
+    var dd = root.querySelector(".pl-simdd"), b = root.querySelector("[data-simdd]"); if (!dd || !b) return;
+    dd.hidden = !open; b.setAttribute("aria-expanded", open); b.querySelector("span").textContent = open ? "▴" : "▾";
+    if (open) drawSim();
+  }
+  function wireSimDd() {
+    var b = root.querySelector("[data-simdd]"); if (b) b.onclick = function () { simToggle(!SIMOPEN); };
+    if (SIMDOC) return; SIMDOC = true;                     // fecha ao clicar fora ou com Esc
+    document.addEventListener("mousedown", function (e) { if (SIMOPEN && !e.target.closest(".pl-simwrap")) simToggle(false); });
+    document.addEventListener("keydown", function (e) { if (SIMOPEN && e.key === "Escape") simToggle(false); });
+  }
+  function sheetBox() { return '<section class="pl-sim"><div id="pl-sim-body"></div></section>'; }
   function f2(v, d) { return (Math.round(v * Math.pow(10, d)) / Math.pow(10, d)).toLocaleString(); }
   function big(v) { return v >= 1e6 ? v.toExponential(2).replace("e+", "e") : f2(v, v < 10 ? 3 : v < 100 ? 2 : 0); }
   var SIMRES = null, SIMBUSY = false;
