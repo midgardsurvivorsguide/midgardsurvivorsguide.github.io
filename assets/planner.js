@@ -539,10 +539,23 @@
   function b64u(u8) { var s = ""; for (var i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
   function unb64u(s) { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
   function pipe(u8, stream) { return new Response(new Blob([u8]).stream().pipeThrough(stream)).arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
+  /* short links #s=CODE: the #z= payload is stored by our Worker (builds/model/share-worker, Cloudflare KV);
+     if the Worker does not answer in time, the long #z= link is used, so sharing never breaks */
+  var SHORT = "https://msg-builds.f-medeirs.workers.dev/b";
+  function withTimeout(p, ms) { return Promise.race([p, new Promise(function (_, no) { setTimeout(function () { no(new Error("timeout")); }, ms); })]); }
   function shareLink(o) {
     var base = location.origin + location.pathname;
     if (!window.CompressionStream) return Promise.resolve(base + "#b=" + encode(o));
-    return pipe(new TextEncoder().encode(JSON.stringify(slim(o, true))), new CompressionStream("deflate-raw")).then(function (z) { return base + "#z=" + b64u(z); });
+    return pipe(new TextEncoder().encode(JSON.stringify(slim(o, true))), new CompressionStream("deflate-raw")).then(function (z) {
+      var long = base + "#z=" + b64u(z);
+      return withTimeout(fetch(SHORT, { method: "POST", headers: { "Content-Type": "text/plain" }, body: "z1." + b64u(z) })
+        .then(function (r) { return r.ok ? r.json() : null; }), 4000)
+        .then(function (j) { return j && /^[2-9A-HJ-NP-Z]{8}$/.test(j.code) ? base + "#s=" + j.code : long; }, function () { return long; });
+    });
+  }
+  function readShort(code) {
+    return fetch(SHORT + "/" + code).then(function (r) { if (!r.ok) throw new Error("missing"); return r.text(); })
+      .then(function (t) { t = t.trim(); if (t.indexOf("z1.") !== 0) throw new Error("bad"); return readLink(t.slice(3)); });
   }
   function readLink(z) {
     return pipe(unb64u(z), new DecompressionStream("deflate-raw")).then(function (u8) { return unslim(JSON.parse(new TextDecoder().decode(u8))); });
@@ -1694,15 +1707,15 @@
     D.classes.forEach(function (c) { D.classNames[c.id] = c.id === "kagerou" ? "Kagerou / Oboro" : c.id === "clown" ? "Clown / Gypsy" : c.name; });
     var cur = null;
     try { var c = JSON.parse(localStorage.getItem(LS_CUR) || "null"); if (valid(c)) cur = clean(c); } catch (e) {}
-    /* a link opens a build: #z= (short), #b= (old long links) or #g=<guide>[:<kit>] (a guide's "Open in planner") */
-    var h = location.hash, mz = h.match(/#z=([\w-]+)/), mb = h.match(/#b=([\w-]+)/), mg = h.match(/#g=([\w-]+)(?::([\w-]+))?/);
-    var incoming = mz ? readLink(mz[1]) : mb ? Promise.resolve().then(function () { return decode(mb[1]); })
+    /* a link opens a build: #s=CODE (short, from our Worker), #z= (self-contained), #b= (old long links) or #g=<guide>[:<kit>] (a guide's "Open in planner") */
+    var h = location.hash, ms = h.match(/#s=([2-9A-HJ-NP-Z]{8})(?![0-9A-Za-z])/), mz = h.match(/#z=([\w-]+)/), mb = h.match(/#b=([\w-]+)/), mg = h.match(/#g=([\w-]+)(?::([\w-]+))?/);
+    var incoming = ms ? readShort(ms[1]) : mz ? readLink(mz[1]) : mb ? Promise.resolve().then(function () { return decode(mb[1]); })
       : mg ? fetch(BASE + "guides.json?v=" + (root.getAttribute("data-v") || "")).then(function (r) { return r.json(); }).then(function (all) {
           var list = all[mg[1]] || [], e = list.filter(function (x) { return x.key === mg[2]; })[0] || list[0];
           return e && e.state;
         })
       : Promise.resolve(null);
-    if (mz || mb || mg) history.replaceState(null, "", location.pathname);
+    if (ms || mz || mb || mg) history.replaceState(null, "", location.pathname);
     incoming.catch(function () { return null; }).then(function (o) {
       if (o && valid(o)) {
         /* keep the build that was open: it goes to "Saved builds" unless it is already there */
