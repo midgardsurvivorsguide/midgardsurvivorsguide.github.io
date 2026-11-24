@@ -819,11 +819,14 @@
       var all = [];
       for (var i = 1; i <= pdf.numPages; i++) all.push(pdf.getPage(i).then(function (pg) {
         return Promise.all([pg.getTextContent(), pg.getAnnotations()]).then(function (x) {
-          return x[0].items.map(function (it) { return it.str; }).join("") + " " + x[1].map(function (a) { return a.url || ""; }).join(" ");
+          return x[0].items.map(function (it) { return it.str; }).join(" ") + " " + x[1].map(function (a) { return a.url || ""; }).join(" ");
         });
       }));
       return Promise.all(all);
-    }).then(function (pages) { return impParse(pages.join(" ").replace(/\s+/g, "")); });
+    }).then(function (pages) {                  // text items keep their spaces, so the code does not glue to the page number ("1/35")
+      var txt = pages.join(" "), m = txt.match(/midgardsurvivors\.com\/build\/?#\s*(MSB1\.[A-Za-z0-9_-]+|[0-9A-Za-z]{12}(?![0-9A-Za-z])|[0-9A-Za-z]{8}(?![0-9A-Za-z]))/);
+      return m ? impParse(m[1]) : impParse(txt);
+    });
   }
   function impTpl(tpl) { return new RegExp("^" + tpl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace("%s", "([0-9]+(?:[.,][0-9]+)?)").replace(/%%/g, "%") + "$", "i"); }
   function impLines(g) { return ((g.item && g.item.foot) || []).map(function (x) { return String(x[0] || ""); }); }
@@ -951,7 +954,7 @@
   var SIMOPEN = false, SIMDOC = false;
   function simToggle(open) {
     SIMOPEN = open;
-    var dd = root.querySelector(".pl-simdd"), b = root.querySelector("[data-simdd]"); if (!dd || !b) return;
+    var dd = root.querySelector(".pl-simwrap .pl-simdd"), b = root.querySelector("[data-simdd]"); if (!dd || !b) return;
     dd.hidden = !open; b.setAttribute("aria-expanded", open); b.querySelector("span").textContent = open ? "▴" : "▾";
     if (open) { if (IMPOPEN) impToggle(false); drawSim(); }
   }
