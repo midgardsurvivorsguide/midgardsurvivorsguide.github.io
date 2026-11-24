@@ -945,7 +945,15 @@ html.dark .card-acts .pl-primary { color: var(--on-red); }
 .pl-top { position: relative; }
 .pl-simwrap { margin-left: auto; padding-bottom: 8px; align-self: flex-end; }
 .pl-simbtn { background: var(--red); border-color: var(--red); color: var(--on-red); font-size: 12px; padding: 5px 12px; }
-.pl-simdd { position: absolute; right: 10px; top: calc(100% + 6px); z-index: 60; width: min(420px, calc(100vw - 32px)); max-height: min(78vh, 760px); overflow: auto;
+.pl-simdd { position: absolute; right: 10px; top: calc(100% + 6px); z-index: 60; width: min(440px, calc(100vw - 32px)); max-height: min(78vh, 760px); overflow: auto;
   background: rgba(20,18,16,.96); border: 1px solid rgba(255,255,255,.35); border-radius: var(--radius); padding: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.6); backdrop-filter: blur(4px); }
+.pl-simdd { padding: 20px 22px; }
 .pl-simdd[hidden] { display: none; }
 @media (max-width: 640px) { .pl-simdd { right: 0; left: 0; margin: 0 auto; } }
+.pl-simdd .pl-simf { gap: 16px; margin: 0; padding-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,.16); }
+.pl-simdd .pl-simf label { gap: 7px; }
+.pl-simdd .pl-simf label.pl-chk { gap: 10px; align-items: center; padding-top: 2px; }
+.pl-simdd .pl-simf select, .pl-simdd .pl-simf input[type=number] { padding: 8px 10px; }
+.pl-simdd #pl-sim-body > :not(.pl-simf) { margin-top: 16px; }
+.pl-simdd #pl-sim-body > .pl-note { margin-top: 10px; }
+.pl-simdd .pl-wide { width: 100%; }

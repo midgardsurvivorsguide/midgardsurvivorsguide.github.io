@@ -765,7 +765,7 @@
     document.addEventListener("mousedown", function (e) { if (SIMOPEN && !e.target.closest(".pl-simwrap")) simToggle(false); });
     document.addEventListener("keydown", function (e) { if (SIMOPEN && e.key === "Escape") simToggle(false); });
   }
-  function sheetBox() { return '<section class="pl-sim"><div id="pl-sim-body"></div></section>'; }
+  function sheetBox() { return '<div class="pl-sim" id="pl-sim-body"></div>'; }
   function f2(v, d) { return (Math.round(v * Math.pow(10, d)) / Math.pow(10, d)).toLocaleString(); }
   function big(v) { return v >= 1e6 ? v.toExponential(2).replace("e+", "e") : f2(v, v < 10 ? 3 : v < 100 ? 2 : 0); }
   var SIMRES = null, SIMBUSY = false;
