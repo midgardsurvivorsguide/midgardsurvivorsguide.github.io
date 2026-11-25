@@ -174,7 +174,7 @@
       if (a === "more") { load(false); return; }
       var c = b.closest(".pubcard"), id = c && c.getAttribute("data-id"); if (!id) return;
       if (a === "copy") {
-        var url = location.origin + location.pathname + "?pb=" + id + "#public";
+        var url = location.origin + location.pathname.replace(/[^/]*$/, "") + "planner/#p=" + id;   // opens the build straight in the Build Lab
         var ok = function () { b.textContent = t("copied"); setTimeout(function () { b.textContent = t("copy"); }, 1400); };
         if (navigator.clipboard) navigator.clipboard.writeText(url).then(ok, function () { prompt("", url); }); else prompt("", url);
       } else if (a === "report") {
