@@ -61,6 +61,7 @@
     });
   });
   document.addEventListener("click", function (e) { if (!e.target.closest || !e.target.closest(".dd")) closeAll(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(); });   // menus open on click only; Esc closes
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeAll(); });
 
   /* home: difficulty tabs + class filter, one state kept in the URL as #<level> or #<level>/<class>.
@@ -87,6 +88,7 @@
       var on = cls && document.querySelector('.clschip[data-cls="' + cls + '"]'), cb = on && on.parentElement;
       if (cb && cb.scrollWidth > cb.clientWidth) cb.scrollLeft = on.offsetLeft - cb.offsetLeft - (cb.clientWidth - on.offsetWidth) / 2;
       if (hb) { hb.setAttribute("data-lv", lv); hb.classList.toggle("filtering", !!cls); }
+      try { document.dispatchEvent(new CustomEvent("msg-home", { detail: { lv: lv, cls: cls } })); } catch (e) {}   // public.js: the Public Builds tab
       var bar = document.querySelector(".clsfilter");
       if (bar) {
         bar.hidden = !cls;
@@ -172,6 +174,24 @@
     var a = e.target.closest && e.target.closest(".toc a[href^='#']"); if (!a) return;
     var s = document.getElementById(a.getAttribute("href").slice(1));
     if (s && s.classList.contains("collapsed")) setOpen(s, true);
+  });
+
+  /* video chapters: the buttons under an embedded YouTube video jump it to that second, on the page (YouTube iframe API via postMessage) */
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".vjump"); if (!b) return;
+    var box = b.closest(".vchap"), v = box && box.previousElementSibling, f = v && v.querySelector("iframe"); if (!f) return;
+    var sec = +b.getAttribute("data-t") || 0;
+    box.querySelectorAll(".vjump").forEach(function (x) { x.classList.toggle("on", x === b); });
+    var send = function (func, args) { f.contentWindow.postMessage(JSON.stringify({ event: "command", func: func, args: args || [] }), "*"); };
+    if (f.getAttribute("data-ready")) { send("seekTo", [sec, true]); send("playVideo"); }
+    else { f.src = f.src.replace(/([?&])(start|autoplay)=\d+&?/g, "$1").replace(/[?&]$/, "") + "&start=" + sec + "&autoplay=1"; }
+    v.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  document.querySelectorAll(".video iframe").forEach(function (f) {
+    f.addEventListener("load", function () {
+      f.setAttribute("data-ready", "1");
+      try { f.contentWindow.postMessage(JSON.stringify({ event: "listening" }), "*"); } catch (e) {}
+    });
   });
 
   /* guide build panel: copy the page link (without the hash) */

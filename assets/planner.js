@@ -1,4 +1,4 @@
-/* Midgard Survivors Guide — Build Planner (character creation, no damage simulation yet).
+/* Midgard Survivors Guide — Build Lab (build planner, game import, DPS simulator).
    Data: planner/data.json, exported from the game (0.2.7) by make_planner_data.py. Rules follow the game's code:
    loadout legendary cap = 1 base + 1 rebirth + 1 per Endless Tower legend floor; 1 unique; 1 soul; item and its own soul exclude each other. */
 (function () {
@@ -153,6 +153,29 @@
     upFull: ["Account upgrades (Kafra, Sage...) at max", "Upgrades da conta (Kafra, Sage...) no máximo", "Mejoras de cuenta (Kafra, Sage...) al máximo", "帳號強化（Kafra、Sage…）全滿"],
     stew: ["Extra HP from Immortal Stew", "HP extra do Immortal Stew", "HP extra de Immortal Stew", "Immortal Stew 額外 HP"],
     sheet: ["Character sheet", "Ficha do personagem", "Ficha del personaje", "角色數據"],
+    pub: ["Publish build", "Publicar build", "Publicar build", "公開配裝"],
+    pubHelp: ["Share this build in Public Builds. Everyone can open it in the Build Lab. Builds imported from the game, unchanged, get the Verified in game badge.",
+      "Compartilhe esta build em Builds Públicas. Qualquer um pode abrir no Laboratório. Builds importadas do jogo, sem alteração, ganham o selo Verificada no jogo.",
+      "Comparte esta build en Builds Públicas. Cualquiera puede abrirla en el Laboratorio. Las builds importadas del juego, sin cambios, reciben el sello Verificada en el juego.",
+      "在玩家公開流派分享這個配裝，任何人都能在實驗室開啟。從遊戲匯入且未修改的配裝會獲得「遊戲驗證」標章。"],
+    pubName: ["Build name", "Nome da build", "Nombre de la build", "配裝名稱"], pubAuthor: ["Your nickname", "Seu apelido", "Tu apodo", "你的暱稱"],
+    pubGoal: ["Made for", "Feita para", "Hecha para", "用途"], pubDesc: ["Short description (optional)", "Descrição curta (opcional)", "Descripción corta (opcional)", "簡短說明（選填）"],
+    goal_hell15: ["Hell 15", "Hell 15", "Hell 15", "Hell 15"], goal_emperium: ["Emperium Festival", "Emperium Festival", "Emperium Festival", "Emperium 祭典"],
+    goal_mvp: ["MVPs", "MVPs", "MVPs", "MVP"], goal_farm: ["Farming", "Farm", "Farmeo", "刷寶"], goal_other: ["Other", "Outro", "Otro", "其他"],
+    pubVer: ["This build came from the game unchanged: it will get the Verified in game badge.", "Esta build veio do jogo sem alteração: vai ganhar o selo Verificada no jogo.",
+      "Esta build vino del juego sin cambios: recibirá el sello Verificada en el juego.", "此配裝自遊戲匯入且未修改：將獲得「遊戲驗證」標章。"],
+    pubGo: ["Publish", "Publicar", "Publicar", "公開"], pubSending: ["Publishing...", "Publicando...", "Publicando...", "公開中..."],
+    pubDone: ["Published! It is in Public Builds now.", "Publicada! Ela já está em Builds Públicas.", "¡Publicada! Ya está en Builds Públicas.", "已公開！現在可在玩家公開流派看到。"],
+    pubSee: ["See it in Public Builds", "Ver em Builds Públicas", "Ver en Builds Públicas", "前往玩家公開流派"],
+    pubExists: ["This exact build is already public.", "Essa mesma build já está pública.", "Esta misma build ya es pública.", "這個配裝已經公開了。"],
+    pubErr_wait: ["Wait 2 minutes between publications.", "Espere 2 minutos entre publicações.", "Espera 2 minutos entre publicaciones.", "兩次公開之間請等待 2 分鐘。"],
+    pubErr_day: ["Daily limit reached (5 builds). Try again tomorrow.", "Limite do dia atingido (5 builds). Tente amanhã.", "Límite diario alcanzado (5 builds). Inténtalo mañana.", "已達每日上限（5 個配裝），請明天再試。"],
+    pubErr_words: ["Please remove offensive words.", "Remova palavras ofensivas, por favor.", "Quita las palabras ofensivas, por favor.", "請移除冒犯性字詞。"],
+    pubErr_links: ["At most one link, and only in the description.", "No máximo um link, e só na descrição.", "Como máximo un enlace, y solo en la descripción.", "最多一個連結，且只能放在說明。"],
+    pubErr_short: ["Name needs 3+ letters and nickname 2+.", "O nome precisa de 3+ letras e o apelido de 2+.", "El nombre necesita 3+ letras y el apodo 2+.", "名稱至少 3 字、暱稱至少 2 字。"],
+    pubErr_captcha: ["Please finish the check above.", "Complete a verificação acima, por favor.", "Completa la verificación de arriba, por favor.", "請完成上方的驗證。"],
+    pubErr_banned: ["Publishing is blocked for you.", "A publicação está bloqueada para você.", "La publicación está bloqueada para ti.", "你已被禁止公開。"],
+    pubErr_any: ["Could not publish. Try again later.", "Não deu para publicar. Tente mais tarde.", "No se pudo publicar. Inténtalo más tarde.", "無法公開，請稍後再試。"],
     imp: ["Import from game", "Importar do jogo", "Importar del juego", "從遊戲匯入"],
     impHelp: ["Paste the link from the game's Export build button (midgardsurvivors.com/build/#...), just the code, or the long MSB1 link. You can also drop the PDF.",
       "Cole o link do botão Exportar build do jogo (midgardsurvivors.com/build/#...), só o código, ou o link longo MSB1. Também dá para soltar o PDF.",
@@ -574,6 +597,8 @@
       banish: (o.banish || []).filter(function (x, i, a) { return upInfo(x) && a.indexOf(x) === i; }).slice(0, D.rules.holyMax),
       favs: (o.favs || []).filter(function (x, i, a) { return upInfo(x) && a.indexOf(x) === i; }).slice(0, D.rules.favMax),
       holy: Math.max(0, Math.min(D.rules.holyMax, o.holy === undefined ? D.rules.holyMax : +o.holy)), fill: o.fill === undefined ? true : !!o.fill,
+      gameCode: /^[0-9A-Z]{8}([0-9A-Z]{4})?$/.test(o.gameCode || "") ? o.gameCode : "", gameSig: typeof o.gameSig === "string" ? o.gameSig.slice(0, 16) : "",
+      noEvo: (o.noEvo || []).filter(function (x, i, a) { return typeof x === "string" && D.skills[x] && a.indexOf(x) === i; }),   // skills the player did not evolve into EX
       sim: (o.sim && typeof o.sim === "object") ? { target: String(o.sim.target || "emperium"), path: o.sim.path === "light" ? "light" : "dark", minutes: Math.max(1, Math.min(120, +o.sim.minutes || 40)), acct: !!o.sim.acct } : {} });
   }
 
@@ -669,9 +694,11 @@
       '<button class="btn" type="button" data-act="reset">' + t("reset") + '</button><button class="btn pl-primary" type="button" disabled title="' + esc(t("soon")) + '">' + t("optimize") + " <small>(" + t("soon") + ")</small></button></div>";
     var impdd = '<div class="pl-impwrap"><button class="btn pl-impbtn" type="button" data-impdd aria-expanded="' + IMPOPEN + '">' + t("imp") +
       ' <span aria-hidden="true">' + (IMPOPEN ? "▴" : "▾") + '</span></button><div class="pl-simdd pl-impdd"' + (IMPOPEN ? "" : " hidden") + ">" + impBox() + "</div></div>";
+    var pubdd = '<div class="pl-pubwrap"><button class="btn pl-impbtn" type="button" data-pubdd aria-expanded="' + PUBOPEN + '">' + t("pub") +
+      ' <span aria-hidden="true">' + (PUBOPEN ? "▴" : "▾") + '</span></button><div class="pl-simdd pl-pubdd"' + (PUBOPEN ? "" : " hidden") + '><div class="pl-imp" id="pl-pub-body"></div></div></div>';
     var simdd = '<div class="pl-simwrap"><button class="btn pl-primary pl-simbtn" type="button" data-simdd aria-expanded="' + SIMOPEN + '">' + t("sim") +
       ' <span aria-hidden="true">' + (SIMOPEN ? "▴" : "▾") + '</span></button><div class="pl-simdd"' + (SIMOPEN ? "" : " hidden") + '>' + sheetBox() + "</div></div>";
-    root.innerHTML = '<div class="pl-top"><div class="pl-tabs" role="tablist">' + tabs + "</div>" + acts + impdd + simdd + "</div>" +
+    root.innerHTML = '<div class="pl-top"><div class="pl-tabs" role="tablist">' + tabs + "</div>" + acts + impdd + pubdd + simdd + "</div>" +
       '<div class="pl-stage"><div class="gp pl-left">' + leftHtml() + '<div id="pl-edit"></div></div>' +
       '<div class="pl-midcol"><div class="gp pl-mid">' + midHtml() + '</div><div class="gp">' + savedHtml() + "</div></div>" +
       '<div class="gp pl-right">' + rightHtml() + "</div></div>";
@@ -876,7 +903,7 @@
     var h = doc.hero || {}, run = doc.run || {}, lg = (doc.lang || "en").slice(0, 2), ok = [], miss = [];
     var c = D.classes.filter(function (x) { return x.id === h.job; })[0] || D.classes.filter(function (x) { return x.id === h.class; })[0];
     if (!c) throw new Error("class " + (h.job || h.class));
-    var o = fresh(c.id), GI = D.gameIcons || {};
+    var o = fresh(c.id), GI = D.gameIcons || {}; o.noEvo = [];
     o.name = (h.name ? h.name + " · " : "") + (h.title || c.name); o.reborn = !!h.reborn; o.lv = +h.level || 1;
     // gear
     (doc.gear || []).forEach(function (g) {
@@ -898,7 +925,7 @@
     (doc.skills || []).forEach(function (sk) {
       var id = sk.id, lv = +sk.lv || 0;
       if (/_x$/.test(id) && sk.evolved) { id = id.slice(0, -2); lv = 5 + lv - 1; }   // evolve(): EX level = 1 + (level - MAX_SKILL_LEVEL)
-      if (upInfo(id) && STATS.indexOf(id) < 0) o.skl[id] = lv; else miss.push(sk.id);
+      if (upInfo(id) && STATS.indexOf(id) < 0) { o.skl[id] = lv; if (!sk.evolved && lv >= 5) o.noEvo.push(id); } else miss.push(sk.id);
     });
     o.album = (doc.album || []).map(function (a) { return a.id; }).filter(function (x) { return D.cards[x]; });
     o.plag = (doc.copies || []).map(function (cp) { return (GI.plag || {})[impIcon(cp.icon)]; }).filter(function (x) { return x && D.plag[x]; });
@@ -926,7 +953,9 @@
     IMPMSG = t("impLoading"); IMPREP = null; drawImp();
     impFetch(src).then(function (doc) {
       var r = impBuild(doc);
-      S = clean(r.state); persist(); IMPMSG = ""; IMPREP = r; editSlot = null; SIMRES = null; render();
+      S = clean(r.state);
+      if (src.code) { S.gameCode = src.code; S.gameSig = pubSig(S); }   // unchanged since import = verifiable on the game's server
+      persist(); IMPMSG = ""; IMPREP = r; editSlot = null; SIMRES = null; render();
     }).catch(function (e) {
       var k = String(e && e.message); IMPREP = null; IMPMSG = k === "missing" ? t("impMissing") : k === "net" ? t("impNet") : t("impBad") + (k && k !== "bad" ? " (" + k + ")" : ""); drawImp();
     });
@@ -962,25 +991,79 @@
     IMPOPEN = open;
     var dd = root.querySelector(".pl-impdd"), b = root.querySelector("[data-impdd]"); if (!dd || !b) return;
     dd.hidden = !open; b.setAttribute("aria-expanded", open); b.querySelector("span").textContent = open ? "▴" : "▾";
-    if (open) { if (SIMOPEN) simToggle(false); drawImp(); var ta = dd.querySelector("textarea"); if (ta) ta.focus(); }
+    if (open) { if (SIMOPEN) simToggle(false); if (PUBOPEN) pubToggle(false); drawImp(); var ta = dd.querySelector("textarea"); if (ta) ta.focus(); }
+  }
+  /* ---------------- Publish to Public Builds (Worker /p, D1) ---------------- */
+  var PUB = SHORT.replace(/\/b$/, "/p"), PUBOPEN = false, PUBMSG = "", PUBRES = null;
+  var TS_SITEKEY = "0x4AAAAAAGRmAtBmn1kf1k5s";   // Cloudflare Turnstile site key (public; widget "Midgard Survivors Guide", hostnames midgardsurvivorsguide.github.io + localhost)
+  function pubSig(o) {   // FNV-1a of the build without the import marks
+    var x = JSON.parse(JSON.stringify(o)); delete x.gameCode; delete x.gameSig; delete x.sim; delete x.name;
+    var t = JSON.stringify(slim(x, true)), h = 2166136261;
+    for (var i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h.toString(36);
+  }
+  function pubDefaultName() {   // imported builds are named "<character> · <title>": keep the title, not the character name
+    var nm = String(S.name || ""); return nm.indexOf(" · ") >= 0 ? nm.split(" · ").slice(1).join(" · ") : (nm || cls().name || "");
+  }
+  function pubVerified() { return !!(S.gameCode && S.gameSig && S.gameSig === pubSig(S)); }
+  function pubKeys() { try { return JSON.parse(localStorage.getItem("msg-pub-keys") || "{}"); } catch (e) { return {}; } }
+  function drawPub() {
+    var el = document.getElementById("pl-pub-body"); if (!el) return;
+    var who = ""; try { who = localStorage.getItem("msg-pub-author") || ""; } catch (e) {}
+    var goals = ["hell15", "emperium", "mvp", "farm", "other"].map(function (g) { return '<option value="' + g + '">' + t("goal_" + g) + "</option>"; }).join("");
+    var done = PUBRES ? '<div class="pl-imp-rep"><p><b>' + (PUBRES.existing ? t("pubExists") : t("pubDone")) + '</b></p><p><a class="btn pl-primary" href="../#public-' + PUBRES.id + '">' + t("pubSee") + "</a></p></div>" : "";
+    el.innerHTML = '<p class="pl-note">' + t("pubHelp") + "</p>" +
+      '<div class="pl-simf"><label>' + t("pubName") + '<input type="text" maxlength="60" data-pub="name" value="' + esc(pubDefaultName()) + '"></label>' +
+      "<label>" + t("pubAuthor") + '<input type="text" maxlength="24" data-pub="author" value="' + esc(who) + '"></label>' +
+      "<label>" + t("pubGoal") + '<select data-pub="goal">' + goals + "</select></label>" +
+      "<label>" + t("pubDesc") + '<textarea data-pub="descr" maxlength="500" rows="3"></textarea></label></div>' +
+      (pubVerified() ? '<p class="pl-note pub-ver">✔ ' + t("pubVer") + "</p>" : "") +
+      (TS_SITEKEY ? '<div class="cf-turnstile" data-sitekey="' + TS_SITEKEY + '"></div>' : "") +
+      '<div class="pl-imp-row"><button class="btn pl-primary" type="button" data-pub="go">' + t("pubGo") + "</button></div>" +
+      (PUBMSG ? '<p class="pl-note">' + esc(PUBMSG) + "</p>" : "") + done;
+    if (TS_SITEKEY && !window.turnstile) { var sc = document.createElement("script"); sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"; sc.async = true; document.head.appendChild(sc); }
+    else if (TS_SITEKEY && window.turnstile) { try { window.turnstile.render(el.querySelector(".cf-turnstile")); } catch (e) {} }
+    el.querySelector('[data-pub="go"]').onclick = function () {
+      var v = function (k) { return (el.querySelector('[data-pub="' + k + '"]') || {}).value || ""; };
+      var tok = el.querySelector('[name="cf-turnstile-response"]'); tok = tok ? tok.value : "";
+      try { localStorage.setItem("msg-pub-author", v("author")); } catch (e) {}
+      PUBMSG = t("pubSending"); PUBRES = null; drawPubMsg(el);
+      var ver = pubVerified(), body = JSON.parse(JSON.stringify(S)); delete body.gameCode; delete body.gameSig; delete body.sim;
+      pipe(new TextEncoder().encode(JSON.stringify(slim(body, true))), new CompressionStream("deflate-raw")).then(function (z) {
+        return fetch(PUB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payload: "z1." + b64u(z), name: v("name"), author: v("author"),
+          goal: v("goal"), descr: v("descr"), game_code: ver ? S.gameCode : "", turnstile: tok }) });
+      }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (j) {
+        if (j && j.id) { if (j.key) { var k = pubKeys(); k[j.id] = j.key; try { localStorage.setItem("msg-pub-keys", JSON.stringify(k)); } catch (e) {} } PUBRES = j; PUBMSG = ""; drawPub(); return; }
+        PUBMSG = T["pubErr_" + (j && j.error)] ? t("pubErr_" + j.error) : t("pubErr_any"); drawPubMsg(el);
+      }, function () { PUBMSG = t("pubErr_any"); drawPubMsg(el); });
+    };
+  }
+  function drawPubMsg(el) { var p = el.querySelector(".pub-msg"); if (!p) { p = document.createElement("p"); p.className = "pl-note pub-msg"; el.appendChild(p); } p.textContent = PUBMSG; }
+  function pubToggle(open) {
+    PUBOPEN = open;
+    var dd = root.querySelector(".pl-pubdd"), b = root.querySelector("[data-pubdd]"); if (!dd || !b) return;
+    dd.hidden = !open; b.setAttribute("aria-expanded", open); b.querySelector("span").textContent = open ? "▴" : "▾";
+    if (open) { if (SIMOPEN) simToggle(false); if (IMPOPEN) impToggle(false); PUBMSG = ""; PUBRES = null; drawPub(); }
   }
   var SIMOPEN = false, SIMDOC = false;
   function simToggle(open) {
     SIMOPEN = open;
     var dd = root.querySelector(".pl-simwrap .pl-simdd"), b = root.querySelector("[data-simdd]"); if (!dd || !b) return;
     dd.hidden = !open; b.setAttribute("aria-expanded", open); b.querySelector("span").textContent = open ? "▴" : "▾";
-    if (open) { if (IMPOPEN) impToggle(false); drawSim(); }
+    if (open) { if (IMPOPEN) impToggle(false); if (PUBOPEN) pubToggle(false); drawSim(); }
   }
   function wireSimDd() {
     var b = root.querySelector("[data-simdd]"); if (b) b.onclick = function () { simToggle(!SIMOPEN); };
     var bi = root.querySelector("[data-impdd]"); if (bi) bi.onclick = function () { impToggle(!IMPOPEN); };
+    var bp = root.querySelector("[data-pubdd]"); if (bp) bp.onclick = function () { pubToggle(!PUBOPEN); };
     if (IMPOPEN) drawImp();
     if (SIMDOC) return; SIMDOC = true;                     // fecha ao clicar fora ou com Esc
     document.addEventListener("mousedown", function (e) {
       if (SIMOPEN && !e.target.closest(".pl-simwrap")) simToggle(false);
       if (IMPOPEN && !e.target.closest(".pl-impwrap")) impToggle(false);
+      if (PUBOPEN && !e.target.closest(".pl-pubwrap")) pubToggle(false);
     });
-    document.addEventListener("keydown", function (e) { if (e.key !== "Escape") return; if (SIMOPEN) simToggle(false); if (IMPOPEN) impToggle(false); });
+    document.addEventListener("keydown", function (e) { if (e.key !== "Escape") return; if (SIMOPEN) simToggle(false); if (IMPOPEN) impToggle(false); if (PUBOPEN) pubToggle(false); });
   }
   function sheetBox() { return '<div class="pl-sim" id="pl-sim-body"></div>'; }
   function f2(v, d) { return (Math.round(v * Math.pow(10, d)) / Math.pow(10, d)).toLocaleString(); }
@@ -1550,7 +1633,7 @@
     c.textBaseline = "alphabetic"; c.fillStyle = "#fff7ec"; c.font = "24px " + FP; c.fillText(fit(c, S.name || t("untitled"), 760), PAD + 6, 56);
     if (job) { c.save(); c.imageSmoothingEnabled = false; c.drawImage(job, PAD + 6, 76, 28, 28); c.restore(); }
     c.font = "bold 20px " + FB; c.fillStyle = IC.ink; c.fillText(D.classNames[c0.id] || c0.name, PAD + 44, 98);
-    c.font = "12px " + FU; c.fillStyle = IC.muted; c.fillText(("Midgard Survivors Guide · Build Planner · Patch " + D.v).toUpperCase(), PAD + 6, 130);
+    c.font = "12px " + FU; c.fillStyle = IC.muted; c.fillText(("Midgard Survivors Guide · Build Lab · Patch " + D.v).toUpperCase(), PAD + 6, 130);
     // equipment
     var y0 = 150 + PAD, gw = 760, tw = W - PAD * 3 - gw;
     box(c, PAD, y0, gw, topH, t("equipment").toUpperCase());
@@ -1708,14 +1791,17 @@
     var cur = null;
     try { var c = JSON.parse(localStorage.getItem(LS_CUR) || "null"); if (valid(c)) cur = clean(c); } catch (e) {}
     /* a link opens a build: #s=CODE (short, from our Worker), #z= (self-contained), #b= (old long links) or #g=<guide>[:<kit>] (a guide's "Open in planner") */
+    var mp = location.hash.match(/#p=([2-9A-HJ-NP-Z]{8})(?![0-9A-Za-z])/);
     var h = location.hash, ms = h.match(/#s=([2-9A-HJ-NP-Z]{8})(?![0-9A-Za-z])/), mz = h.match(/#z=([\w-]+)/), mb = h.match(/#b=([\w-]+)/), mg = h.match(/#g=([\w-]+)(?::([\w-]+))?/);
-    var incoming = ms ? readShort(ms[1]) : mz ? readLink(mz[1]) : mb ? Promise.resolve().then(function () { return decode(mb[1]); })
+    var incoming = mp ? fetch(PUB + "/" + mp[1]).then(function (r) { if (!r.ok) throw new Error("missing"); return r.json(); })
+        .then(function (j) { var p = String(j.payload || ""); if (p.indexOf("z1.") !== 0) throw new Error("bad"); return readLink(p.slice(3)).then(function (o) { o.name = j.name; return o; }); })
+      : ms ? readShort(ms[1]) : mz ? readLink(mz[1]) : mb ? Promise.resolve().then(function () { return decode(mb[1]); })
       : mg ? fetch(BASE + "guides.json?v=" + (root.getAttribute("data-v") || "")).then(function (r) { return r.json(); }).then(function (all) {
           var list = all[mg[1]] || [], e = list.filter(function (x) { return x.key === mg[2]; })[0] || list[0];
           return e && e.state;
         })
       : Promise.resolve(null);
-    if (ms || mz || mb || mg) history.replaceState(null, "", location.pathname);
+    if (mp || ms || mz || mb || mg) history.replaceState(null, "", location.pathname);
     incoming.catch(function () { return null; }).then(function (o) {
       if (o && valid(o)) {
         /* keep the build that was open: it goes to "Saved builds" unless it is already there */
