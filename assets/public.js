@@ -30,6 +30,27 @@
       "Sé el primero: abre tu build en el Laboratorio y pulsa Publicar build.", "成為第一個：在配裝實驗室開啟你的配裝並按「公開配裝」。"],
     fail: ["Could not load Public Builds. Try again later.", "Não deu para carregar as Builds Públicas. Tente mais tarde.", "No se pudieron cargar las Builds Públicas. Inténtalo más tarde.", "無法載入玩家公開流派，請稍後再試。"],
     win: ["cleared", "vencida", "superada", "通關"], lv: ["Lv", "Nv", "Nv", "Lv"],
+    like: ["Like", "Curtir", "Me gusta", "讚"], dislike: ["Dislike", "Não curtir", "No me gusta", "倒讚"],
+    sort: ["Sort", "Ordenar", "Ordenar", "排序"], s_def: ["Verified first", "Verificadas primeiro", "Verificadas primero", "驗證優先"],
+    s_top: ["Most liked", "Mais curtidas", "Más gustadas", "最多讚"], s_new: ["Newest", "Mais novas", "Más nuevas", "最新"],
+    fbTitle: ["Community Feedback", "Feedback da comunidade", "Feedback de la comunidad", "社群回饋"],
+    fbIntro: ["Ideas, bugs and wishes for the site and the Build Lab. Like the ones you agree with; the most liked go first.",
+      "Ideias, bugs e pedidos para o site e o Laboratório. Curta os que você concorda; os mais curtidos ficam no topo.",
+      "Ideas, errores y pedidos para el sitio y el Laboratorio. Dale me gusta a los que apoyas; los más votados van primero.",
+      "對網站與配裝實驗室的點子、錯誤與需求。按讚支持你同意的，最多讚的排在前面。"],
+    fbNew: ["Send feedback", "Enviar feedback", "Enviar feedback", "送出回饋"], fbAuthor: ["Your nickname", "Seu apelido", "Tu apodo", "你的暱稱"],
+    fbCat: ["Type", "Tipo", "Tipo", "類型"], c_idea: ["Idea", "Ideia", "Idea", "點子"], c_bug: ["Bug", "Bug", "Error", "錯誤"], c_other: ["Other", "Outro", "Otro", "其他"],
+    fbBody: ["What would you like to tell us? (10 to 500 characters)", "O que você quer dizer? (10 a 500 caracteres)", "¿Qué quieres decirnos? (10 a 500 caracteres)", "想說什麼？（10 到 500 字）"],
+    fbSend: ["Send", "Enviar", "Enviar", "送出"], fbSending: ["Sending...", "Enviando...", "Enviando...", "送出中..."], fbSent: ["Thanks! Your feedback is up.", "Valeu! Seu feedback está no ar.", "¡Gracias! Tu feedback ya está publicado.", "感謝！你的回饋已發布。"],
+    fbNone: ["No feedback yet. Be the first.", "Ainda não há feedback. Seja o primeiro.", "Aún no hay feedback. Sé el primero.", "還沒有回饋，成為第一個吧。"],
+    e_wait: ["Wait 2 minutes between posts.", "Espere 2 minutos entre envios.", "Espera 2 minutos entre envíos.", "兩次送出之間請等待 2 分鐘。"],
+    e_day: ["Daily limit reached (5). Try again tomorrow.", "Limite do dia atingido (5). Tente amanhã.", "Límite diario alcanzado (5). Inténtalo mañana.", "已達每日上限（5），請明天再試。"],
+    e_words: ["Please remove offensive words.", "Remova palavras ofensivas, por favor.", "Quita las palabras ofensivas, por favor.", "請移除冒犯性字詞。"],
+    e_links: ["At most one link, and only in the text.", "No máximo um link, e só no texto.", "Como máximo un enlace, y solo en el texto.", "最多一個連結，且只能放在內文。"],
+    e_short: ["Nickname 2+ letters and text 10+.", "Apelido com 2+ letras e texto com 10+.", "Apodo 2+ letras y texto 10+.", "暱稱至少 2 字、內文至少 10 字。"],
+    e_captcha: ["Please finish the check above.", "Complete a verificação acima, por favor.", "Completa la verificación de arriba, por favor.", "請完成上方的驗證。"],
+    e_banned: ["Posting is blocked for you.", "O envio está bloqueado para você.", "El envío está bloqueado para ti.", "你已被禁止發文。"],
+    e_any: ["Could not send. Try again later.", "Não deu para enviar. Tente mais tarde.", "No se pudo enviar. Inténtalo más tarde.", "無法送出，請稍後再試。"],
   };
   function t(k) { return T[k][LI[lang()]]; }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -42,6 +63,28 @@
     var bits = [r.danger, r.oath ? "Oath " + r.oath : "", r.time ? clock(r.time) : "", r.level ? t("lv") + " " + r.level : "", r.stage, r.victory ? "✔ " + t("win") : ""];
     return bits.filter(Boolean).map(esc).join(" · ");
   }
+  /* likes / dislikes: one vote per visitor per item (the Worker keys it by IP hash); this browser remembers its own vote */
+  function myVotes() { try { return JSON.parse(localStorage.getItem("msg-votes") || "{}"); } catch (e) { return {}; } }
+  function voteHtml(kind, it) {
+    var v = myVotes()[kind + ":" + it.id] || 0;
+    return '<span class="votes" data-kind="' + kind + '" data-vid="' + it.id + '">' +
+      '<button type="button" class="btn vbtn' + (v === 1 ? " on" : "") + '" data-vote="1" title="' + t("like") + '" aria-pressed="' + (v === 1) + '">▲ <b>' + (it.likes || 0) + "</b></button>" +
+      '<button type="button" class="btn vbtn' + (v === -1 ? " on" : "") + '" data-vote="-1" title="' + t("dislike") + '" aria-pressed="' + (v === -1) + '">▼ <b>' + (it.dislikes || 0) + "</b></button></span>";
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".votes [data-vote]"); if (!b) return;
+    var box = b.closest(".votes"), kind = box.getAttribute("data-kind"), id = box.getAttribute("data-vid"), want = +b.getAttribute("data-vote");
+    var all = myVotes(), cur = all[kind + ":" + id] || 0, val = cur === want ? 0 : want;
+    box.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+    fetch(API + "/v", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind: kind, id: id, value: val }) })
+      .then(function (r) { return r.json(); }).then(function (j) {
+        if (j.likes === undefined) throw 0;
+        if (val) all[kind + ":" + id] = val; else delete all[kind + ":" + id];
+        try { localStorage.setItem("msg-votes", JSON.stringify(all)); } catch (x) {}
+        box.outerHTML = voteHtml(kind, { id: id, likes: j.likes, dislikes: j.dislikes });
+      }).catch(function () { box.querySelectorAll("button").forEach(function (x) { x.disabled = false; }); });
+  });
+
   function card(b, base) {
     var mine = !!keys()[b.id];
     return '<article class="pubcard" id="pb-' + b.id + '" data-id="' + b.id + '">' +
@@ -50,7 +93,7 @@
       '<div class="pubtags"><span class="tag pubgoal">' + t("g_" + b.goal) + (b.goal === "hell15" && b.oath ? " · Oath " + b.oath : "") + "</span>" + (b.verified ? '<span class="tag pubver">✔ ' + t("verified") + "</span>" : "") + "</div>" +
       (b.verified && b.run ? '<p class="pubrun">' + runLine(b.run) + "</p>" : "") +
       (b.descr ? '<p class="pubdesc">' + esc(b.descr) + "</p>" : "") +
-      '<div class="pubacts"><a class="btn pl-primary" href="' + base + "planner/#p=" + b.id + '">' + t("open") + "</a>" +
+      '<div class="pubacts">' + voteHtml("b", b) + '<a class="btn pl-primary" href="' + base + "planner/#p=" + b.id + '">' + t("open") + "</a>" +
       '<button class="btn" type="button" data-pa="copy">' + t("copy") + "</button>" +
       (mine ? '<button class="btn" type="button" data-pa="del">' + t("del") + "</button>" : '<button class="btn pubrep" type="button" data-pa="report">' + t("report") + "</button>") +
       "</div></article>";
@@ -70,7 +113,7 @@
   /* ---------------- home tab ---------------- */
   var panel = document.getElementById("lv-public");
   if (panel) {
-    var st = { cls: "", goal: "", oath: 0, page: 0, items: [], more: false, busy: false, loaded: null };
+    var st = { cls: "", goal: "", oath: 0, sort: "", page: 0, items: [], more: false, busy: false, loaded: null };
     var want = (location.search.match(/[?&]pb=([2-9A-HJ-NP-Z]{8})/) || location.hash.match(/^#public-([2-9A-HJ-NP-Z]{8})$/) || [])[1];
     var base = "";
     var shell = function () {
@@ -81,6 +124,8 @@
         '<div class="pubtools"><label>' + t("goal") + ' <select data-pf="goal">' + goals + "</select></label>" +
         '<label class="pf-oath"' + (st.goal === "hell15" ? "" : " hidden") + ">" + t("oathMin") + ' <select data-pf="oath">' +
           [0, 10, 20, 30, 35, 40].map(function (o) { return '<option value="' + o + '"' + (st.oath === o ? " selected" : "") + ">" + (o ? o + (o < 40 ? "+" : "") : t("anyOath")) + "</option>"; }).join("") +
+        "</select></label><label>" + t("sort") + ' <select data-pf="sort">' + [["", "s_def"], ["top", "s_top"], ["new", "s_new"]].map(function (o) {
+          return '<option value="' + o[0] + '"' + (st.sort === o[0] ? " selected" : "") + ">" + t(o[1]) + "</option>"; }).join("") +
         '</select></label><a class="btn pl-primary" href="planner/">' + t("publish") + "</a></div></div>" +
         '<div class="howto pub-howto">' + howtoHtml(false) + '</div><div class="pubgrid"></div><div class="pubfoot"></div>';
       var hw = panel.querySelector(".pub-howto"), open = false;
@@ -90,6 +135,7 @@
         panel.querySelector(".pf-oath").hidden = st.goal !== "hell15"; panel.querySelector('[data-pf="oath"]').value = String(st.oath); load(true);
       };
       panel.querySelector('[data-pf="oath"]').onchange = function (e) { st.oath = +e.target.value || 0; load(true); };
+      panel.querySelector('[data-pf="sort"]').onchange = function (e) { st.sort = e.target.value; load(true); };
     };
     var paint = function () {
       var g = panel.querySelector(".pubgrid"), f = panel.querySelector(".pubfoot"); if (!g) return;
@@ -102,7 +148,7 @@
       if (st.busy) return;
       if (reset) { st.page = 0; st.items = []; }
       st.busy = true; paint();
-      var q = API + "/p?page=" + st.page + (st.cls ? "&cls=" + st.cls : "") + (st.goal ? "&goal=" + st.goal : "") + (st.goal === "hell15" && st.oath ? "&oath=" + st.oath : "");
+      var q = API + "/p?page=" + st.page + (st.cls ? "&cls=" + st.cls : "") + (st.goal ? "&goal=" + st.goal : "") + (st.goal === "hell15" && st.oath ? "&oath=" + st.oath : "") + (st.sort ? "&sort=" + st.sort : "");
       fetch(q).then(function (r) { return r.json(); }).then(function (j) {
         st.items = st.items.concat(j.items || []); st.more = !!j.more; st.page++; st.busy = false;
         if (want && !st.items.some(function (b) { return b.id === want; })) {
@@ -146,6 +192,91 @@
     });
   }
 
+  /* ---------------- Community Feedback (home tab) ---------------- */
+  var TS_SITEKEY = "0x4AAAAAAGRmAtBmn1kf1k5s";   // Cloudflare Turnstile (public site key)
+  var fbp = document.getElementById("lv-feedback");
+  if (fbp) {
+    var fs = { cat: "", sort: "", page: 0, items: [], more: false, busy: false, loaded: false, ts: null, msg: "" };
+    var fkeys = function () { try { return JSON.parse(localStorage.getItem("msg-fb-keys") || "{}"); } catch (e) { return {}; } };
+    var fitem = function (f) {
+      var mine = !!fkeys()[f.id];
+      return '<article class="pubcard fbcard" data-id="' + f.id + '"><div class="fbhead"><span class="tag fbcat-' + esc(f.cat) + '">' + t("c_" + f.cat) + "</span>" +
+        "<small>" + t("by") + " " + esc(f.author) + " · " + esc(when(f.created)) + "</small></div>" +
+        '<p class="pubdesc">' + esc(f.body) + '</p><div class="pubacts">' + voteHtml("f", f) +
+        (mine ? '<button class="btn" type="button" data-fa="del">' + t("del") + "</button>" : '<button class="btn pubrep" type="button" data-fa="report">' + t("report") + "</button>") +
+        "</div></article>";
+    };
+    var fshell = function () {
+      var who = ""; try { who = localStorage.getItem("msg-pub-author") || ""; } catch (e) {}
+      var cats = ["idea", "bug", "other"].map(function (c) { return '<option value="' + c + '">' + t("c_" + c) + "</option>"; }).join("");
+      fbp.innerHTML = '<div class="pubtop"><div><h2>' + t("fbTitle") + '</h2><p class="muted">' + t("fbIntro") + "</p></div>" +
+        '<div class="pubtools"><label>' + t("fbCat") + ' <select data-ff="cat"><option value="">' + t("all") + "</option>" + cats + "</select></label>" +
+        "<label>" + t("sort") + ' <select data-ff="sort"><option value="">' + t("s_top") + '</option><option value="new">' + t("s_new") + "</option></select></label></div></div>" +
+        '<form class="fbform pubcard"><b class="pubname">' + t("fbNew") + "</b>" +
+        '<div class="fbrow"><label>' + t("fbAuthor") + '<input type="text" maxlength="24" name="author" value="' + esc(who) + '"></label>' +
+        "<label>" + t("fbCat") + '<select name="cat">' + cats + "</select></label></div>" +
+        '<textarea name="body" maxlength="500" rows="3" placeholder="' + esc(t("fbBody")) + '"></textarea>' +
+        '<div class="fbts"></div><div class="pubacts"><button class="btn pl-primary" type="submit">' + t("fbSend") + '</button><span class="fbmsg muted"></span></div></form>' +
+        '<div class="pubgrid fbgrid"></div><div class="pubfoot"></div>';
+      fbp.querySelector('[data-ff="cat"]').onchange = function (e) { fs.cat = e.target.value; fload(true); };
+      fbp.querySelector('[data-ff="sort"]').onchange = function (e) { fs.sort = e.target.value; fload(true); };
+      var holder = fbp.querySelector(".fbts");
+      var render = function () { try { fs.ts = window.turnstile.render(holder, { sitekey: TS_SITEKEY }); } catch (e) {} };
+      if (window.turnstile) render();
+      else { var sc = document.createElement("script"); sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; sc.async = true; sc.onload = render; document.head.appendChild(sc); }
+      fbp.querySelector(".fbform").onsubmit = function (e) {
+        e.preventDefault();
+        var f = e.target, msg = fbp.querySelector(".fbmsg"), tok = "";
+        try { tok = window.turnstile && fs.ts !== null ? window.turnstile.getResponse(fs.ts) || "" : ""; } catch (x) {}
+        try { localStorage.setItem("msg-pub-author", f.author.value); } catch (x) {}
+        msg.textContent = t("fbSending");
+        fetch(API + "/f", { method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ author: f.author.value, cat: f.cat.value, body: f.body.value, turnstile: tok }) })
+          .then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (j) {
+            if (j && j.id) {
+              var k = fkeys(); k[j.id] = j.key; try { localStorage.setItem("msg-fb-keys", JSON.stringify(k)); } catch (x) {}
+              f.body.value = ""; msg.textContent = t("fbSent"); fs.sort = "new"; fbp.querySelector('[data-ff="sort"]').value = "new"; fload(true);
+            } else msg.textContent = T["e_" + (j && j.error)] ? t("e_" + j.error) : t("e_any");
+            try { window.turnstile.reset(fs.ts); } catch (x) {}
+          }, function () { msg.textContent = t("e_any"); });
+      };
+    };
+    var fpaint = function () {
+      var g = fbp.querySelector(".fbgrid"), f = fbp.querySelector(".pubfoot"); if (!g) return;
+      g.innerHTML = fs.items.length ? fs.items.map(fitem).join("") : '<p class="muted">' + (fs.busy ? t("loading") : t("fbNone")) + "</p>";
+      f.innerHTML = fs.more ? '<button class="btn" type="button" data-fa="more">' + t("more") + "</button>" : "";
+    };
+    var fload = function (reset) {
+      if (fs.busy) return;
+      if (reset) { fs.page = 0; fs.items = []; }
+      fs.busy = true; fpaint();
+      fetch(API + "/f?page=" + fs.page + (fs.cat ? "&cat=" + fs.cat : "") + (fs.sort ? "&sort=" + fs.sort : "")).then(function (r) { return r.json(); }).then(function (j) {
+        fs.items = fs.items.concat(j.items || []); fs.more = !!j.more; fs.page++; fs.busy = false; fpaint();
+      }, function () { fs.busy = false; fbp.querySelector(".fbgrid").innerHTML = '<p class="muted">' + t("fail") + "</p>"; });
+    };
+    var fopen = function () { if (fs.loaded) return; fs.loaded = true; fshell(); fload(true); };
+    document.addEventListener("msg-home", function (e) { if ((e.detail || {}).lv === "feedback") fopen(); });
+    if (document.querySelector('.lvtab[data-lv="feedback"][aria-selected="true"]')) fopen();
+    fbp.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("[data-fa]"); if (!b) return;
+      var a = b.getAttribute("data-fa");
+      if (a === "more") { fload(false); return; }
+      var c = b.closest(".fbcard"), id = c && c.getAttribute("data-id"); if (!id) return;
+      if (a === "report") {
+        var why = prompt(t("reportAsk")); if (why === null) return;
+        fetch(API + "/f/" + id + "/report", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ reason: why.slice(0, 200) }) })
+          .then(function () { b.textContent = t("reported"); b.disabled = true; });
+      } else if (a === "del") {
+        if (!confirm(t("delAsk"))) return;
+        fetch(API + "/f/" + id, { method: "DELETE", headers: { "X-Edit-Key": fkeys()[id] || "" } }).then(function (r) {
+          if (!r.ok) return;
+          var k = fkeys(); delete k[id]; try { localStorage.setItem("msg-fb-keys", JSON.stringify(k)); } catch (x) {}
+          fs.items = fs.items.filter(function (x) { return x.id !== id; }); fpaint();
+        });
+      }
+    });
+  }
+
   /* ---------------- admin queue (/admin/) ---------------- */
   var adm = document.getElementById("pub-admin");
   if (adm) {
@@ -160,8 +291,13 @@
       call("GET", "/admin/queue").then(function (j) {
         if (j.error) { key = ""; try { sessionStorage.removeItem("msg-admin"); } catch (e) {} draw("Wrong key."); return; }
         var items = j.items || [];
-        adm.innerHTML = '<p><b>' + items.length + '</b> reported or hidden builds. <button class="btn" type="button" data-ad="logout">Log out</button></p>' +
+        adm.innerHTML = '<p><b>' + items.length + '</b> reported or hidden builds and feedback. <button class="btn" type="button" data-ad="logout">Log out</button></p>' +
           items.map(function (b) {
+            if (b.kind === "f") return '<article class="pubcard" data-id="' + b.id + '" data-kind="f"><b class="pubname">Feedback (' + esc(b.cat) + ")</b><small>by " + esc(b.author) + " · " +
+              esc(when(b.created)) + " · " + (b.hidden ? "<b>HIDDEN</b>" : "visible") + " · " + b.reports + ' reports</small><p class="pubdesc">' + esc(b.body) + "</p>" +
+              (b.reasons.length ? "<p class=\"muted\">Reasons: " + b.reasons.map(esc).join(" | ") + "</p>" : "") +
+              '<div class="pubacts"><button class="btn" type="button" data-ad="restore">Restore</button><button class="btn" type="button" data-ad="delete">Delete</button>' +
+              '<button class="btn" type="button" data-ad="ban">Ban author</button></div></article>';
             return '<article class="pubcard" data-id="' + b.id + '"><b class="pubname">' + esc(b.name) + "</b><small>" + esc(b.cls) + " · by " + esc(b.author) + " · " + esc(when(b.created)) +
               " · " + (b.hidden ? "<b>HIDDEN</b>" : "visible") + " · " + b.reports + " reports</small>" + (b.descr ? '<p class="pubdesc">' + esc(b.descr) + "</p>" : "") +
               (b.reasons.length ? "<p class=\"muted\">Reasons: " + b.reasons.map(esc).join(" | ") + "</p>" : "") +
@@ -175,9 +311,10 @@
       var a = b.getAttribute("data-ad"), c = b.closest(".pubcard"), id = c && c.getAttribute("data-id");
       if (a === "login") { key = adm.querySelector(".admkey").value.trim(); try { sessionStorage.setItem("msg-admin", key); } catch (x) {} draw(); return; }
       if (a === "logout") { key = ""; try { sessionStorage.removeItem("msg-admin"); } catch (x) {} draw(); return; }
-      if (a === "restore") call("POST", "/admin/restore/" + id).then(function () { draw(); });
-      if (a === "delete" && confirm("Delete this build for good?")) call("DELETE", "/p/" + id).then(function () { draw(); });
-      if (a === "ban" && confirm("Ban this author (hides all their builds and blocks new ones)?")) call("POST", "/admin/ban/" + id).then(function () { draw(); });
+      var fb = c && c.getAttribute("data-kind") === "f";
+      if (a === "restore") call("POST", "/admin/restore/" + (fb ? "f/" : "") + id).then(function () { draw(); });
+      if (a === "delete" && confirm("Delete this for good?")) call("DELETE", (fb ? "/f/" : "/p/") + id).then(function () { draw(); });
+      if (a === "ban" && confirm("Ban this author (hides everything they posted and blocks new posts)?")) call("POST", "/admin/ban/" + (fb ? "f/" : "") + id).then(function () { draw(); });
     });
     draw();
   }

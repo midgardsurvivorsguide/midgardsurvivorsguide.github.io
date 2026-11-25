@@ -1014,3 +1014,20 @@ html.dark .card-acts .pl-primary { color: var(--on-red); }
 .howto .video { margin-top: 10px; }
 .pub-howto { margin: 0 0 14px; }
 .pl-impdd .vchap .vjump { font-size: 11px; padding: 4px 8px; }
+
+/* likes / dislikes (Public Builds, Feedback) */
+.votes { display: inline-flex; gap: 4px; margin-right: 2px; }
+.votes .vbtn { font-size: 11px; padding: 4px 8px; min-width: 44px; }
+.votes .vbtn b { font-variant-numeric: tabular-nums; margin-left: 2px; }
+.votes .vbtn.on { background: var(--red); color: var(--on-red); border-color: var(--red); }
+/* Community Feedback tab */
+.homebar[data-lv="feedback"] .clsbar, .homebar[data-lv="feedback"] .clsfilter { display: none !important; }
+.fbform { margin-bottom: 14px; gap: 10px; }
+.fbrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.fbrow label { display: flex; flex-direction: column; gap: 4px; font: 400 11px var(--font-ui); text-transform: uppercase; letter-spacing: .4px; }
+.fbform input[type=text], .fbform select, .fbform textarea { padding: 7px 9px; border-radius: 6px; font: 13px var(--font-body); border: 2px solid var(--border); background: var(--panel-2); color: var(--ink); }
+.fbform textarea { width: 100%; box-sizing: border-box; resize: vertical; }
+.fbhead { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fbhead small { color: var(--muted); font-size: 12px; }
+.fbcat-bug { background: var(--bad-bg); } .fbcat-idea { background: var(--ok-bg); }
+.fbmsg { font-size: 13px; align-self: center; }

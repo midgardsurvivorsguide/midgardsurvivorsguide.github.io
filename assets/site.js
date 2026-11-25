@@ -70,7 +70,7 @@
   if (lvtabs.length) {
     var hb = document.querySelector(".homebar"), chips = document.querySelectorAll(".clschip");
     var home = { lv: "beginner", cls: "" };
-    var okLv = function (v) { return v === "beginner" || v === "intermediate" || v === "advanced" || v === "public"; };
+    var okLv = function (v) { return v === "beginner" || v === "intermediate" || v === "advanced" || v === "public" || v === "feedback"; };
     var okCls = function (v) { return !!v && !!document.querySelector('.clschip[data-cls="' + v + '"]'); };
     var render = function () {
       var lv = home.lv, cls = home.cls;
