@@ -108,7 +108,7 @@
     };
     var fromHash = function () {
       /* plain Home (no hash) always opens on Beginner with no class filter; the last tab is not remembered (user, 2026-11-24) */
-      var parts = (location.hash || "").replace("#", "").split("/");
+      var parts = (location.hash || "").replace("#", "").replace(/^public-[2-9A-HJ-NP-Z]{8}$/, "public").split("/");
       set(okLv(parts[0]) ? parts[0] : "beginner", okCls(parts[1]) ? parts[1] : "", false);
     };
     lvtabs.forEach(function (t) { t.addEventListener("click", function () { set(t.getAttribute("data-lv"), home.cls, true); }); });

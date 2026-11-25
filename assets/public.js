@@ -59,7 +59,7 @@
   var panel = document.getElementById("lv-public");
   if (panel) {
     var st = { cls: "", goal: "", page: 0, items: [], more: false, busy: false, loaded: null };
-    var want = (location.search.match(/[?&]pb=([2-9A-HJ-NP-Z]{8})/) || [])[1];
+    var want = (location.search.match(/[?&]pb=([2-9A-HJ-NP-Z]{8})/) || location.hash.match(/^#public-([2-9A-HJ-NP-Z]{8})$/) || [])[1];
     var base = "";
     var shell = function () {
       var goals = ["", "hell15", "emperium", "mvp", "farm", "other"].map(function (g) {

@@ -1011,7 +1011,7 @@
     var el = document.getElementById("pl-pub-body"); if (!el) return;
     var who = ""; try { who = localStorage.getItem("msg-pub-author") || ""; } catch (e) {}
     var goals = ["hell15", "emperium", "mvp", "farm", "other"].map(function (g) { return '<option value="' + g + '">' + t("goal_" + g) + "</option>"; }).join("");
-    var done = PUBRES ? '<div class="pl-imp-rep"><p><b>' + (PUBRES.existing ? t("pubExists") : t("pubDone")) + '</b></p><p><a class="btn pl-primary" href="../#public-' + PUBRES.id + '">' + t("pubSee") + "</a></p></div>" : "";
+    var done = PUBRES ? '<div class="pl-imp-rep"><p><b>' + (PUBRES.existing ? t("pubExists") : t("pubDone")) + '</b></p><p><a class="btn pl-primary" href="../?pb=' + PUBRES.id + '#public">' + t("pubSee") + "</a></p></div>" : "";
     el.innerHTML = '<p class="pl-note">' + t("pubHelp") + "</p>" +
       '<div class="pl-simf"><label>' + t("pubName") + '<input type="text" maxlength="60" data-pub="name" value="' + esc(pubDefaultName()) + '"></label>' +
       "<label>" + t("pubAuthor") + '<input type="text" maxlength="24" data-pub="author" value="' + esc(who) + '"></label>' +
