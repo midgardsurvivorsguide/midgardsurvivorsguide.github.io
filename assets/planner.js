@@ -828,7 +828,17 @@
   }
   /* ---------------- import from the game's build export (core/build_card.gd) ----------------
      link midgardsurvivors.com/build/#CODE -> GET relay.midgardsurvivors.com/b/CODE -> "MSB1." + base64url(gzip(JSON)) */
-  var RELAY = "https://relay.midgardsurvivors.com/b/", IMPOPEN = false, IMPMSG = "", IMPREP = null;
+  /* "How to export your build" video (YouTube wm-57jIaiJU): a button that opens the player with chapter buttons (site.js .vjump) */
+  var HOWTO = { id: "wm-57jIaiJU", ch: [[0,["The site","O site","El sitio","網站"]],[9,["In game: Album → History → Export","No jogo: Álbum → Historial → Exportar","En el juego: Álbum → Historial → Exportar","遊戲中：圖鑑 → 歷史 → 匯出"]],[24,["Import in the Build Lab","Importar no Laboratório","Importar en el Laboratorio","在實驗室匯入"]],[33,["Publish","Publicar","Publicar","公開"]]] };
+  function howtoHtml(open) {
+    var li = { en: 0, pt: 1, es: 2, zh: 3 }[document.documentElement.getAttribute("data-ui")] || 0;
+    var clk = function (s) { return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); };
+    var lab = ["Watch how (1 min)", "Veja como (1 min)", "Mira cómo (1 min)", "觀看教學（1 分鐘）"][li], jump = ["Jump to", "Pular para", "Saltar a", "跳到"][li];
+    return '<button type="button" class="btn howto-btn" data-howto>▶ ' + lab + "</button>" + (open ? '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' + HOWTO.id +
+      '?enablejsapi=1&amp;rel=0" title="How to export your build" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>' +
+      '<div class="vchap"><small>' + jump + "</small>" + HOWTO.ch.map(function (c) { return '<button type="button" class="btn vjump" data-t="' + c[0] + '"><b>' + clk(c[0]) + "</b> " + c[1][li] + "</button>"; }).join("") + "</div>" : "");
+  }
+  var RELAY = "https://relay.midgardsurvivors.com/b/", IMPOPEN = false, IMPMSG = "", IMPREP = null, HOWOPEN = false;
   function impParse(txt) {
     txt = String(txt || "").trim();
     var m = txt.match(/MSB1\.[A-Za-z0-9_-]+/); if (m) return { packed: m[0] };
@@ -975,7 +985,9 @@
     el.innerHTML = '<p class="pl-note">' + t("impHelp") + '</p><textarea data-imp="txt" rows="2" spellcheck="false" placeholder="https://midgardsurvivors.com/build/#..."></textarea>' +
       '<div class="pl-imp-row"><button class="btn pl-primary" type="button" data-imp="go">' + t("impGo") + '</button><label class="btn pl-imp-file">' + t("impPdf") +
       '<input type="file" accept="application/pdf,.pdf" data-imp="pdf" hidden></label></div>' +
-      (IMPMSG ? '<p class="pl-note">' + esc(IMPMSG) + "</p>" : "") + rep + '<p class="pl-note muted">' + t("impWhere") + "</p>";
+      (IMPMSG ? '<p class="pl-note">' + esc(IMPMSG) + "</p>" : "") + rep + '<p class="pl-note muted">' + t("impWhere") + "</p>" +
+      '<div class="howto">' + howtoHtml(HOWOPEN) + "</div>";
+    var hb = el.querySelector("[data-howto]"); if (hb) hb.onclick = function () { HOWOPEN = !HOWOPEN; el.querySelector(".howto").innerHTML = howtoHtml(HOWOPEN); el.querySelector("[data-howto]").onclick = hb.onclick; };
     var ta = el.querySelector('[data-imp="txt"]');
     el.querySelector('[data-imp="go"]').onclick = function () { impRun(impParse(ta.value)); };
     ta.onkeydown = function (e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); impRun(impParse(ta.value)); } };

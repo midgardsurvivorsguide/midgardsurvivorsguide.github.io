@@ -55,6 +55,17 @@
       "</div></article>";
   }
 
+  /* "How to export your build" video (YouTube wm-57jIaiJU): a button that opens the player with chapter buttons (site.js .vjump) */
+  var HOWTO = { id: "wm-57jIaiJU", ch: [[0,["The site","O site","El sitio","網站"]],[9,["In game: Album → History → Export","No jogo: Álbum → Historial → Exportar","En el juego: Álbum → Historial → Exportar","遊戲中：圖鑑 → 歷史 → 匯出"]],[24,["Import in the Build Lab","Importar no Laboratório","Importar en el Laboratorio","在實驗室匯入"]],[33,["Publish","Publicar","Publicar","公開"]]] };
+  function howtoHtml(open) {
+    var li = { en: 0, pt: 1, es: 2, zh: 3 }[document.documentElement.getAttribute("data-ui")] || 0;
+    var clk = function (s) { return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); };
+    var lab = ["Watch how (1 min)", "Veja como (1 min)", "Mira cómo (1 min)", "觀看教學（1 分鐘）"][li], jump = ["Jump to", "Pular para", "Saltar a", "跳到"][li];
+    return '<button type="button" class="btn howto-btn" data-howto>▶ ' + lab + "</button>" + (open ? '<div class="video"><iframe src="https://www.youtube-nocookie.com/embed/' + HOWTO.id +
+      '?enablejsapi=1&amp;rel=0" title="How to export your build" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>' +
+      '<div class="vchap"><small>' + jump + "</small>" + HOWTO.ch.map(function (c) { return '<button type="button" class="btn vjump" data-t="' + c[0] + '"><b>' + clk(c[0]) + "</b> " + c[1][li] + "</button>"; }).join("") + "</div>" : "");
+  }
+
   /* ---------------- home tab ---------------- */
   var panel = document.getElementById("lv-public");
   if (panel) {
@@ -67,7 +78,9 @@
       }).join("");
       panel.innerHTML = '<div class="pubtop"><div><h2>' + t("title") + '</h2><p class="muted">' + t("intro") + "</p></div>" +
         '<div class="pubtools"><label>' + t("goal") + ' <select data-pf="goal">' + goals + '</select></label><a class="btn pl-primary" href="planner/">' + t("publish") + "</a></div></div>" +
-        '<div class="pubgrid"></div><div class="pubfoot"></div>';
+        '<div class="howto pub-howto">' + howtoHtml(false) + '</div><div class="pubgrid"></div><div class="pubfoot"></div>';
+      var hw = panel.querySelector(".pub-howto"), open = false;
+      hw.addEventListener("click", function (e) { if (!e.target.closest("[data-howto]")) return; open = !open; hw.innerHTML = howtoHtml(open); });
       panel.querySelector('[data-pf="goal"]').onchange = function (e) { st.goal = e.target.value; load(true); };
     };
     var paint = function () {
