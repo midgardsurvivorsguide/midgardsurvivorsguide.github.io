@@ -159,7 +159,8 @@
       "Comparte esta build en Builds Públicas. Cualquiera puede abrirla en el Laboratorio. Las builds importadas del juego, sin cambios, reciben el sello Verificada en el juego.",
       "在玩家公開流派分享這個配裝，任何人都能在實驗室開啟。從遊戲匯入且未修改的配裝會獲得「遊戲驗證」標章。"],
     pubName: ["Build name", "Nome da build", "Nombre de la build", "配裝名稱"], pubAuthor: ["Your nickname", "Seu apelido", "Tu apodo", "你的暱稱"],
-    pubGoal: ["Made for", "Feita para", "Hecha para", "用途"], pubDesc: ["Short description (optional)", "Descrição curta (opcional)", "Descripción corta (opcional)", "簡短說明（選填）"],
+    pubGoal: ["Made for", "Feita para", "Hecha para", "用途"],
+    pubOath: ["Oath it clears", "Oath que ela fecha", "Oath que supera", "可通過的誓約"], pubNoOath: ["No oath", "Sem oath", "Sin oath", "無誓約"], pubDesc: ["Short description (optional)", "Descrição curta (opcional)", "Descripción corta (opcional)", "簡短說明（選填）"],
     goal_hell15: ["Hell 15", "Hell 15", "Hell 15", "Hell 15"], goal_emperium: ["Emperium Festival", "Emperium Festival", "Emperium Festival", "Emperium 祭典"],
     goal_mvp: ["MVPs", "MVPs", "MVPs", "MVP"], goal_farm: ["Farming", "Farm", "Farmeo", "刷寶"], goal_other: ["Other", "Outro", "Otro", "其他"],
     pubVer: ["This build came from the game unchanged: it will get the Verified in game badge.", "Esta build veio do jogo sem alteração: vai ganhar o selo Verificada no jogo.",
@@ -1028,6 +1029,8 @@
       '<div class="pl-simf"><label>' + t("pubName") + '<input type="text" maxlength="60" data-pub="name" value="' + esc(pubDefaultName()) + '"></label>' +
       "<label>" + t("pubAuthor") + '<input type="text" maxlength="24" data-pub="author" value="' + esc(who) + '"></label>' +
       "<label>" + t("pubGoal") + '<select data-pub="goal">' + goals + "</select></label>" +
+      '<label class="pub-oath">' + t("pubOath") + '<select data-pub="oath"><option value="0">' + t("pubNoOath") + "</option>" +
+        Array.apply(null, Array(40)).map(function (_, i) { return '<option value="' + (i + 1) + '">Oath ' + (i + 1) + "</option>"; }).join("") + "</select></label>" +
       "<label>" + t("pubDesc") + '<textarea data-pub="descr" maxlength="500" rows="3"></textarea></label></div>' +
       (pubVerified() ? '<p class="pl-note pub-ver">✔ ' + t("pubVer") + "</p>" : "") +
       (TS_SITEKEY ? '<div class="cf-turnstile" data-sitekey="' + TS_SITEKEY + '"></div>' : "") +
@@ -1035,6 +1038,8 @@
       (PUBMSG ? '<p class="pl-note">' + esc(PUBMSG) + "</p>" : "") + done;
     if (TS_SITEKEY && !window.turnstile) { var sc = document.createElement("script"); sc.src = "https://challenges.cloudflare.com/turnstile/v0/api.js"; sc.async = true; document.head.appendChild(sc); }
     else if (TS_SITEKEY && window.turnstile) { try { window.turnstile.render(el.querySelector(".cf-turnstile")); } catch (e) {} }
+    var gsel = el.querySelector('[data-pub="goal"]'), olab = el.querySelector(".pub-oath");
+    var oathShow = function () { olab.hidden = gsel.value !== "hell15"; }; gsel.onchange = oathShow; oathShow();
     el.querySelector('[data-pub="go"]').onclick = function () {
       var v = function (k) { return (el.querySelector('[data-pub="' + k + '"]') || {}).value || ""; };
       var tok = el.querySelector('[name="cf-turnstile-response"]'); tok = tok ? tok.value : "";
@@ -1043,7 +1048,7 @@
       var ver = pubVerified(), body = JSON.parse(JSON.stringify(S)); delete body.gameCode; delete body.gameSig; delete body.sim;
       pipe(new TextEncoder().encode(JSON.stringify(slim(body, true))), new CompressionStream("deflate-raw")).then(function (z) {
         return fetch(PUB, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payload: "z1." + b64u(z), name: v("name"), author: v("author"),
-          goal: v("goal"), descr: v("descr"), game_code: ver ? S.gameCode : "", turnstile: tok }) });
+          goal: v("goal"), oath: v("goal") === "hell15" ? +v("oath") || 0 : 0, descr: v("descr"), game_code: ver ? S.gameCode : "", turnstile: tok }) });
       }).then(function (r) { return r.json().catch(function () { return {}; }); }).then(function (j) {
         if (j && j.id) { if (j.key) { var k = pubKeys(); k[j.id] = j.key; try { localStorage.setItem("msg-pub-keys", JSON.stringify(k)); } catch (e) {} } PUBRES = j; PUBMSG = ""; drawPub(); return; }
         PUBMSG = T["pubErr_" + (j && j.error)] ? t("pubErr_" + j.error) : t("pubErr_any"); drawPubMsg(el);

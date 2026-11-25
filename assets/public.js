@@ -13,6 +13,7 @@
       "玩家分享的配裝。任何一個都能在實驗室開啟、模擬與修改。有「遊戲驗證」標章的配裝直接來自遊戲匯出。"],
     publish: ["Publish your build", "Publique a sua build", "Publica tu build", "公開你的配裝"],
     goal: ["Made for", "Feita para", "Hecha para", "用途"], all: ["All", "Todas", "Todas", "全部"],
+    oathMin: ["Oath", "Oath", "Oath", "誓約"], anyOath: ["Any", "Qualquer", "Cualquiera", "不限"],
     g_hell15: ["Hell 15", "Hell 15", "Hell 15", "Hell 15"], g_emperium: ["Emperium Festival", "Emperium Festival", "Emperium Festival", "Emperium 祭典"],
     g_mvp: ["MVPs", "MVPs", "MVPs", "MVP"], g_farm: ["Farming", "Farm", "Farmeo", "刷寶"], g_other: ["Other", "Outro", "Otro", "其他"],
     verified: ["Verified in game", "Verificada no jogo", "Verificada en el juego", "遊戲驗證"],
@@ -46,7 +47,7 @@
     return '<article class="pubcard" id="pb-' + b.id + '" data-id="' + b.id + '">' +
       '<div class="pubhead"><img src="' + base + "planner/sprites/" + esc(b.cls) + '.png" alt="" loading="lazy"><div><b class="pubname">' + esc(b.name) + "</b>" +
       "<small>" + esc(clsName(b.cls)) + " · " + t("by") + " " + esc(b.author) + " · " + esc(when(b.created)) + "</small></div></div>" +
-      '<div class="pubtags"><span class="tag pubgoal">' + t("g_" + b.goal) + "</span>" + (b.verified ? '<span class="tag pubver">✔ ' + t("verified") + "</span>" : "") + "</div>" +
+      '<div class="pubtags"><span class="tag pubgoal">' + t("g_" + b.goal) + (b.goal === "hell15" && b.oath ? " · Oath " + b.oath : "") + "</span>" + (b.verified ? '<span class="tag pubver">✔ ' + t("verified") + "</span>" : "") + "</div>" +
       (b.verified && b.run ? '<p class="pubrun">' + runLine(b.run) + "</p>" : "") +
       (b.descr ? '<p class="pubdesc">' + esc(b.descr) + "</p>" : "") +
       '<div class="pubacts"><a class="btn pl-primary" href="' + base + "planner/#p=" + b.id + '">' + t("open") + "</a>" +
@@ -69,7 +70,7 @@
   /* ---------------- home tab ---------------- */
   var panel = document.getElementById("lv-public");
   if (panel) {
-    var st = { cls: "", goal: "", page: 0, items: [], more: false, busy: false, loaded: null };
+    var st = { cls: "", goal: "", oath: 0, page: 0, items: [], more: false, busy: false, loaded: null };
     var want = (location.search.match(/[?&]pb=([2-9A-HJ-NP-Z]{8})/) || location.hash.match(/^#public-([2-9A-HJ-NP-Z]{8})$/) || [])[1];
     var base = "";
     var shell = function () {
@@ -77,11 +78,18 @@
         return '<option value="' + g + '"' + (st.goal === g ? " selected" : "") + ">" + (g ? t("g_" + g) : t("all")) + "</option>";
       }).join("");
       panel.innerHTML = '<div class="pubtop"><div><h2>' + t("title") + '</h2><p class="muted">' + t("intro") + "</p></div>" +
-        '<div class="pubtools"><label>' + t("goal") + ' <select data-pf="goal">' + goals + '</select></label><a class="btn pl-primary" href="planner/">' + t("publish") + "</a></div></div>" +
+        '<div class="pubtools"><label>' + t("goal") + ' <select data-pf="goal">' + goals + "</select></label>" +
+        '<label class="pf-oath"' + (st.goal === "hell15" ? "" : " hidden") + ">" + t("oathMin") + ' <select data-pf="oath">' +
+          [0, 10, 20, 30, 35, 40].map(function (o) { return '<option value="' + o + '"' + (st.oath === o ? " selected" : "") + ">" + (o ? o + (o < 40 ? "+" : "") : t("anyOath")) + "</option>"; }).join("") +
+        '</select></label><a class="btn pl-primary" href="planner/">' + t("publish") + "</a></div></div>" +
         '<div class="howto pub-howto">' + howtoHtml(false) + '</div><div class="pubgrid"></div><div class="pubfoot"></div>';
       var hw = panel.querySelector(".pub-howto"), open = false;
       hw.addEventListener("click", function (e) { if (!e.target.closest("[data-howto]")) return; open = !open; hw.innerHTML = howtoHtml(open); });
-      panel.querySelector('[data-pf="goal"]').onchange = function (e) { st.goal = e.target.value; load(true); };
+      panel.querySelector('[data-pf="goal"]').onchange = function (e) {
+        st.goal = e.target.value; if (st.goal !== "hell15") st.oath = 0;
+        panel.querySelector(".pf-oath").hidden = st.goal !== "hell15"; panel.querySelector('[data-pf="oath"]').value = String(st.oath); load(true);
+      };
+      panel.querySelector('[data-pf="oath"]').onchange = function (e) { st.oath = +e.target.value || 0; load(true); };
     };
     var paint = function () {
       var g = panel.querySelector(".pubgrid"), f = panel.querySelector(".pubfoot"); if (!g) return;
@@ -94,7 +102,7 @@
       if (st.busy) return;
       if (reset) { st.page = 0; st.items = []; }
       st.busy = true; paint();
-      var q = API + "/p?page=" + st.page + (st.cls ? "&cls=" + st.cls : "") + (st.goal ? "&goal=" + st.goal : "");
+      var q = API + "/p?page=" + st.page + (st.cls ? "&cls=" + st.cls : "") + (st.goal ? "&goal=" + st.goal : "") + (st.goal === "hell15" && st.oath ? "&oath=" + st.oath : "");
       fetch(q).then(function (r) { return r.json(); }).then(function (j) {
         st.items = st.items.concat(j.items || []); st.more = !!j.more; st.page++; st.busy = false;
         if (want && !st.items.some(function (b) { return b.id === want; })) {
